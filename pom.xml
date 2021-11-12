@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <packaging>jar</packaging>
+    <name>assigning-mark</name>
+    <groupId>cn.rocket</groupId>
+    <artifactId>AssignMark</artifactId>
+    <version>0.5-pre-SNAPSHOT</version>
+    <inceptionYear>2021</inceptionYear>
+
+    <developers>
+        <developer>
+            <id>Rocket</id>
+            <name>RocketMaDev</name>
+            <email>ma2014119@outlook.com</email>
+        </developer>
+    </developers>
+
+    <contributors/>
+
+    <licenses>
+        <license>
+            <name>Apache 2.0</name>
+            <url>https://github.com/RocketMaDev/AssignMark/blob/cmd/LICENSE</url>
+        </license>
+    </licenses>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.jfoenix</groupId>
+            <artifactId>jfoenix</artifactId>
+            <version>8.0.10</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi</artifactId>
+            <version>5.1.0</version>
+        </dependency>
+    </dependencies>
+
+    <properties>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
+    </properties>
+    
+</project>
