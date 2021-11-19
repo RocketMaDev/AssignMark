@@ -19,5 +19,11 @@
     <orderEntry type="library" name="Maven: commons-io:commons-io:2.11.0" level="project" />
     <orderEntry type="library" name="Maven: com.zaxxer:SparseBitSet:1.2" level="project" />
     <orderEntry type="library" name="Maven: org.apache.logging.log4j:log4j-api:2.14.1" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.poi:poi-ooxml-lite:5.1.0" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.xmlbeans:xmlbeans:5.0.2" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.poi:poi-ooxml:5.1.0" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.commons:commons-compress:1.21" level="project" />
+    <orderEntry type="library" name="Maven: com.github.virtuald:curvesapi:1.06" level="project" />
+    <orderEntry type="library" name="Maven: commons-cli:commons-cli:1.5.0" level="project" />
   </component>
 </module>
