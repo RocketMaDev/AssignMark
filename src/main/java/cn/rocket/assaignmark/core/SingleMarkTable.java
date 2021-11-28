@@ -50,7 +50,7 @@ public class SingleMarkTable {
         return Math.toIntExact(Math.round(result));
     }
 
-    private void searchStages() {
+    public void searchStages() {
         stages = new int[STAGES];
         int pos = 0, buffer = 0, cachedBuffer, j;
         for (int i = 0; i < stages.length; i++) {
@@ -97,7 +97,7 @@ public class SingleMarkTable {
         return stage;
     }
 
-    int[] assignMark() {
+    public int[] assignMark() {
         if (assignedMarks != null)
             return assignedMarks;
         searchStages();

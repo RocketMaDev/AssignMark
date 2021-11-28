@@ -9,7 +9,8 @@ import javafx.stage.Stage;
  */
 public class Launcher extends Application {
     @Override
-    public void start(Stage primaryStage) throws Exception {
-
+    public void start(Stage primaryStage) {
+        System.out.println("尚未完成，请等待未来版本发布");
+        System.exit(0);
     }
 }
