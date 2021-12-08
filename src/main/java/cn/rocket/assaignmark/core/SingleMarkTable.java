@@ -7,7 +7,6 @@ import static cn.rocket.assaignmark.core.AssigningTable.STAGES;
  * @version 0.9-pre
  */
 public class SingleMarkTable {
-    //    public static final int STAGE_END = STAGES - 1; //TODO STAGE_END
     public static final MarkTarget[] targets;
 
     static {

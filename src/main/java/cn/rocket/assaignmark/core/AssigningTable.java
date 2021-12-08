@@ -1,5 +1,6 @@
 package cn.rocket.assaignmark.core;
 
+import cn.rocket.assaignmark.core.event.AMEvent;
 import cn.rocket.assaignmark.core.event.AMEventHandler;
 import cn.rocket.assaignmark.core.event.Notifier;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
@@ -12,6 +13,7 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
 /**
@@ -30,6 +32,10 @@ public class AssigningTable {
     public static final int BIOLOGY = 5;
     public static final int TECHNOLOGY = 6;
 
+    public static final int BOOL_ROW = 1;
+    public static final int MARK_ROW_START = 2;
+    public static final int MARK_COL_START = 1;
+
     private final XSSFSheet assigningSheet;
     private XSSFWorkbook wb;
     private final Notifier notifier;
@@ -38,14 +44,16 @@ public class AssigningTable {
 
     public AssigningTable(String wbPath, AMEventHandler handler) {
         notifier = new Notifier(handler);
-        // TODO notifier.notify(0)
+        notifier.notify(AMEvent.LOAD_AT);
         try {
             OPCPackage pkg = OPCPackage.open(new FileInputStream(wbPath));
             wb = new XSSFWorkbook(pkg);
         } catch (InvalidFormatException e) {
-            //TODO notifier.notify(32)
+            notifier.notify(AMEvent.ERROR_AT_INCORRECT_FORMAT);
+        } catch (FileNotFoundException e) {
+            notifier.notify(AMEvent.ERROR_AT_NOT_FOUND);
         } catch (IOException e) {
-            //TODO notifier.notify(33)
+            notifier.notify(AMEvent.ERROR_READING_AT);
         }
         assigningSheet = wb.getSheetAt(0);
     }
@@ -53,11 +61,11 @@ public class AssigningTable {
     public void checkAndLoad() {
         if (allReqrStageNums != null)
             return;
-        //TODO notifier.notify(1)
+        notifier.notify(AMEvent.CHECK_AT);
         isIntegers = new boolean[STAGES];
         allReqrStageNums = new double[SUBJECTS][STAGES];
         DataFormatter formatter = new DataFormatter();
-        Row boolRow = assigningSheet.getRow(0);//TODO bool row
+        Row boolRow = assigningSheet.getRow(BOOL_ROW);
         String s;
         for (int i = 0; i < SUBJECTS; i++) {
             s = formatter.formatCellValue(boolRow.getCell(i,
@@ -66,18 +74,18 @@ public class AssigningTable {
         }
         Row[] rows = new Row[STAGES];
         Cell c;
-        for (int r = 0; r < 1 + STAGES; r++)
-            rows[r] = assigningSheet.getRow(r + 1);//TODO start row
+        for (int r = 0; r < STAGES; r++)
+            rows[r] = assigningSheet.getRow(MARK_ROW_START + r);
         for (int i = 0; i < SUBJECTS; i++)
             for (int r = 0; r < STAGES; r++) {
-                c = rows[r].getCell(i, Row.MissingCellPolicy.RETURN_NULL_AND_BLANK);//TODO i row
+                c = rows[r].getCell(MARK_COL_START + i, Row.MissingCellPolicy.RETURN_NULL_AND_BLANK);
                 allReqrStageNums[i][r] =
                         c.getCellType().equals(CellType.NUMERIC) ? Double.parseDouble(formatter.formatCellValue(c)) : 0;
             }
         try {
             wb.close();
         } catch (IOException e) {
-            //TODO notifier.notify(34);
+            e.printStackTrace();
         }
     }
 

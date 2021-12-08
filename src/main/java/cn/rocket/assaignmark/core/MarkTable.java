@@ -1,5 +1,6 @@
 package cn.rocket.assaignmark.core;
 
+import cn.rocket.assaignmark.core.event.AMEvent;
 import cn.rocket.assaignmark.core.event.AMEventHandler;
 import cn.rocket.assaignmark.core.event.Notifier;
 import cn.rocket.assaignmark.core.exception.IncorrectSheetException;
@@ -21,8 +22,8 @@ import static cn.rocket.assaignmark.core.AssigningTable.*;
  * @version 0.9-pre
  */
 public class MarkTable {
-    public static final int ROW_LIMIT = 10;//TODO ROW_LIMIT
-    public static final int COL_LIMIT = 5;//TODO COL_LIMIT
+    public static final int ROW_LIMIT = 10;
+    public static final int COL_LIMIT = 5;
     public static final int VALID_PERSONS = 0;
     public static final int MARK_COL = 1;
     public static final int ASSIGNING_COL = 2;
@@ -43,14 +44,16 @@ public class MarkTable {
         this.assigningTable = assigningTable;
         this.outputPath = outputPath;
         notifier = new Notifier(handler);
-        //TODO notifier.notify(4)
+        notifier.notify(AMEvent.LOAD_MT);
         try {
             OPCPackage pkg = OPCPackage.open(new FileInputStream(wbPath));
             markWorkbook = new XSSFWorkbook(pkg);
+        } catch (FileNotFoundException e) {
+            notifier.notify(AMEvent.ERROR_MT_NOT_FOUND);
         } catch (InvalidFormatException e) {
-            //TODO notifier.notify(34)
+            notifier.notify(AMEvent.ERROR_READING_AT);
         } catch (IOException e) {
-            //TODO notifier.notify(35)
+            notifier.notify(AMEvent.ERROR_READING_MT);
         }
     }
 
@@ -73,7 +76,7 @@ public class MarkTable {
             row = sheet.getRow(r);
             if (row == null)
                 continue;
-            while (offset < 5 && flag != 3) {
+            while (offset < COL_LIMIT && flag != 3) {
                 c = row.getCell(hp + offset);
                 if (c == null) {
                     offset++;
@@ -146,7 +149,7 @@ public class MarkTable {
     }
 
     public void checkAndLoad() {
-        //TODO notifier.notify(6)
+        notifier.notify(AMEvent.LOAD_MT);
         allMarks = new double[SUBJECTS][];
         markSheets = new XSSFSheet[SUBJECTS];
         allSheetInfos = new int[SUBJECTS][INFO_COUNT];
@@ -181,15 +184,16 @@ public class MarkTable {
             if (markSheets[i] == null)
                 continue;
             try {
+                notifier.notify(AMEvent.getIndexAt(4 + i)); // 4:ASSIGN_POLITICS.index
                 readSheetInfos(markSheets[i], i);
                 readMarks(markSheets[i], i);
             } catch (IncorrectSheetException e) {
                 try {
                     markWorkbook.close();
                 } catch (IOException ioException) {
-                    //TODO notifier.notify(37)
+                    ioException.printStackTrace();
                 }
-                //TODO notifier.notify(36)
+                notifier.notify(AMEvent.ERROR_MT_INCORRECT_FORMAT);
             }
         }
     }
@@ -217,9 +221,9 @@ public class MarkTable {
             try {
                 markWorkbook.close();
             } catch (IOException e) {
-                //TODO notifier.notify(aaa)
+                e.printStackTrace();
             }
-            //TODO notifier.notify(bbb)
+            notifier.notify(AMEvent.ERROR_MT_INCORRECT_FORMAT);
         }
         for (int i = 0; i < SUBJECTS; i++) {
             if (markSheets[i] == null)
@@ -230,20 +234,20 @@ public class MarkTable {
             int[] assignedMarks = smt.assignMark();
             writeAssignedMarks(i, assignedMarks);
         }
-        //TODO notifier.notify(?)
+        notifier.notify(AMEvent.WRITE_OUT);
         try (FileOutputStream out = new FileOutputStream(outputPath)) {
             markWorkbook.write(out);
         } catch (FileNotFoundException e) {
-            //TODO not..
+            notifier.notify(AMEvent.ERROR_INVALID_OUTPUT_PATH);
         } catch (IOException e) {
-            //TODO noti..
+            notifier.notify(AMEvent.ERROR_FAILED_TO_WRITE);
         } finally {
             try {
                 markWorkbook.close();
             } catch (IOException e) {
-                //TODO notif..
+                e.printStackTrace();
             }
         }
-        //TODO notifie..
+        notifier.notify(AMEvent.DONE);
     }
 }
