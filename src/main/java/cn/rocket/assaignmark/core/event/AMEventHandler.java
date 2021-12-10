@@ -5,5 +5,5 @@ package cn.rocket.assaignmark.core.event;
  * @version 0.9-pre
  */
 public interface AMEventHandler {
-    void handle(AMEvent event);
+    void handle(AMEvent event, String msg);
 }

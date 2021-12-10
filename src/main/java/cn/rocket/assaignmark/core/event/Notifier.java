@@ -13,11 +13,11 @@ public class Notifier {
 
     // TODO ThreadPool
     public synchronized void notify(AMEvent event) {
-        if (handler != null)
-            new Thread(() -> handler.handle(event), "AMNotifier Thread").start();//TODO thread name
+        notify(event, null);
     }
 
     public synchronized void notify(AMEvent event, String msg) {
-
+        if (handler != null)
+            new Thread(() -> handler.handle(event, msg), "AMNotifier Thread").start();//TODO thread name
     }
 }
