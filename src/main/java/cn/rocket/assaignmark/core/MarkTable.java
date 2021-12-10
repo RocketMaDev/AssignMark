@@ -38,9 +38,13 @@ public class MarkTable {
     private final String outputPath;
     private final AssigningTable assigningTable;
 
-    public MarkTable(String wbPath, AMEventHandler handler, String outputPath, AssigningTable assigningTable) {
-        if (assigningTable == null)
-            throw new NullPointerException("assigningTable不能为null!");
+    MarkTable(String wbPath, AMEventHandler handler, String outputPath, AssigningTable assigningTable, Notifier notifier) {
+        if (notifier != null)
+            this.notifier = notifier;
+        else
+            this.notifier = new Notifier(handler);
+        if (assigningTable == null || assigningTable.isNotLoaded())
+            throw new NullPointerException("assigningTable can not null or empty!");
         this.assigningTable = assigningTable;
         this.outputPath = outputPath;
         notifier = new Notifier(handler);
@@ -55,6 +59,10 @@ public class MarkTable {
         } catch (IOException e) {
             notifier.notify(AMEvent.ERROR_READING_MT);
         }
+    }
+
+    public MarkTable(String wbPath, AMEventHandler handler, String outputPath, AssigningTable assigningTable) {
+        this(wbPath, handler, outputPath, assigningTable, null);
     }
 
     /**
@@ -149,6 +157,9 @@ public class MarkTable {
     }
 
     public void checkAndLoad() {
+        if (allMarks != null) {
+            return;
+        }
         notifier.notify(AMEvent.LOAD_MT);
         allMarks = new double[SUBJECTS][];
         markSheets = new XSSFSheet[SUBJECTS];
@@ -211,6 +222,9 @@ public class MarkTable {
     }
 
     public void calcAssignedMarks() {
+        if (allMarks == null) {
+            throw new NullPointerException("please invoke checkAndLoad() first.");
+        }
         boolean allEmpty = true;
         for (int i = 0; i < SUBJECTS; i++)
             if (markSheets[i] != null) {
@@ -230,7 +244,6 @@ public class MarkTable {
                 continue;
             SingleMarkTable smt = new SingleMarkTable(allMarks[i], assigningTable.getReqrStageNums(
                     i, allSheetInfos[i][VALID_PERSONS]));
-            smt.searchStages();
             int[] assignedMarks = smt.assignMark();
             writeAssignedMarks(i, assignedMarks);
         }
