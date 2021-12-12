@@ -13,4 +13,10 @@
       <module name="AssignMark" target="8" />
     </bytecodeTargetLevel>
   </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_STRING" value="--encoding UTF-8" />
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="AssignMark" options="" />
+    </option>
+  </component>
 </project>

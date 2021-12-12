@@ -55,8 +55,8 @@ public class Main {
             if (!scanner.nextLine().equals("y"))
                 return;
         }
-        AMEventHandler handler = e -> {
-
+        AMEventHandler handler = (e, msg) -> {
+            System.out.println(msg);
         };
         assert assigningTablePath != null && markTablePath != null && outputPath != null;
         new AMFactory(assigningTablePath, markTablePath, handler, outputPath).work();

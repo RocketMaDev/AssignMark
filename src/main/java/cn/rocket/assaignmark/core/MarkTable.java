@@ -262,5 +262,6 @@ public class MarkTable {
             }
         }
         notifier.notify(AMEvent.DONE);
+        notifier.shutdown();
     }
 }

@@ -4,6 +4,12 @@ import cn.rocket.assaignmark.core.event.AMEvent;
 import cn.rocket.assaignmark.core.event.AMEventHandler;
 import cn.rocket.assaignmark.core.event.Notifier;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+
 /**
  * @author Rocket
  * @version 0.9-pre
@@ -24,7 +30,13 @@ public class AMFactory {
     }
 
     public static void extractTable(String outputPath) {
-        // TODO FileChannel
+        try (InputStream is = AMFactory.class.getResourceAsStream("/amres/core/template.xlsx")) {
+            assert is != null;
+            Files.copy(is, Paths.get(outputPath), StandardCopyOption.REPLACE_EXISTING
+            );
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void work() {

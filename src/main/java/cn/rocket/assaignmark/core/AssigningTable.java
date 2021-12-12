@@ -97,7 +97,6 @@ public class AssigningTable {
 
         // 读取赋分比例?人数?
         Row boolRow = assigningSheet.getRow(BOOL_ROW);
-        String s;
         for (int i = 0; i < SUBJECTS; i++) {
             c = boolRow.getCell(i + MARK_COL_START, Row.MissingCellPolicy.RETURN_NULL_AND_BLANK);
             if (c.getCellType().equals(CellType.BOOLEAN))
