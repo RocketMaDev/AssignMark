@@ -24,9 +24,14 @@ public class Notifier {
             executor.execute(() -> handler.handle(event, msg));
         else if (msg != null)
             System.out.println("Notifier:" + msg);
+        if (event.getIndex() >= 32) // 32:ERROR_AT_NOT_FOUND
+            executor.shutdown();
     }
 
-    public void shutdown() {
+    public boolean shutdown() {
+        if (executor.isShutdown())
+            return false;
         executor.shutdown();
+        return true;
     }
 }

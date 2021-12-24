@@ -3,6 +3,7 @@ package cn.rocket.assaignmark.core;
 import cn.rocket.assaignmark.core.event.AMEvent;
 import cn.rocket.assaignmark.core.event.AMEventHandler;
 import cn.rocket.assaignmark.core.event.Notifier;
+import cn.rocket.assaignmark.core.exception.EmptyMarkTableException;
 import cn.rocket.assaignmark.core.exception.IncorrectSheetException;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
@@ -33,7 +34,7 @@ public class MarkTable {
     private double[][] allMarks;
     private XSSFSheet[] markSheets;
     private int[][] allSheetInfos;
-    private XSSFWorkbook markWorkbook;
+    private final XSSFWorkbook markWorkbook;
     private final Notifier notifier;
     private final String outputPath;
     private final AssigningTable assigningTable;
@@ -54,10 +55,13 @@ public class MarkTable {
             markWorkbook = new XSSFWorkbook(pkg);
         } catch (FileNotFoundException e) {
             notifier.notify(AMEvent.ERROR_MT_NOT_FOUND);
+            throw new RuntimeException(e);
         } catch (InvalidFormatException e) {
             notifier.notify(AMEvent.ERROR_READING_AT);
+            throw new RuntimeException(e);
         } catch (IOException e) {
             notifier.notify(AMEvent.ERROR_READING_MT);
+            throw new RuntimeException(e);
         }
     }
 
@@ -205,6 +209,7 @@ public class MarkTable {
                     ioException.printStackTrace();
                 }
                 notifier.notify(AMEvent.ERROR_MT_INCORRECT_FORMAT);
+                throw new RuntimeException(e);
             }
         }
     }
@@ -237,7 +242,8 @@ public class MarkTable {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            notifier.notify(AMEvent.ERROR_MT_INCORRECT_FORMAT);
+            notifier.notify(AMEvent.ERROR_MT_EMPTY);
+            throw new RuntimeException(new EmptyMarkTableException());
         }
         for (int i = 0; i < SUBJECTS; i++) {
             if (markSheets[i] == null)
@@ -252,8 +258,10 @@ public class MarkTable {
             markWorkbook.write(out);
         } catch (FileNotFoundException e) {
             notifier.notify(AMEvent.ERROR_INVALID_OUTPUT_PATH);
+            throw new RuntimeException(e);
         } catch (IOException e) {
             notifier.notify(AMEvent.ERROR_FAILED_TO_WRITE);
+            throw new RuntimeException(e);
         } finally {
             try {
                 markWorkbook.close();

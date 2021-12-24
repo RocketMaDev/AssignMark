@@ -15,6 +15,7 @@ import java.nio.file.StandardCopyOption;
  * @version 0.9-pre
  */
 public class AMFactory {
+    public static final String TEMPLATE_PATH = "/amres/core/template.xlsx";
     private final String assigningTablePath;
     private final String markTablePath;
     private final AMEventHandler handler;
@@ -29,13 +30,10 @@ public class AMFactory {
         this.notifier = new Notifier(handler);
     }
 
-    public static void extractTable(String outputPath) {
-        try (InputStream is = AMFactory.class.getResourceAsStream("/amres/core/template.xlsx")) {
+    public static void extractTable(String outputPath) throws IOException {
+        try (InputStream is = AMFactory.class.getResourceAsStream(TEMPLATE_PATH)) {
             assert is != null;
-            Files.copy(is, Paths.get(outputPath), StandardCopyOption.REPLACE_EXISTING
-            );
-        } catch (IOException e) {
-            e.printStackTrace();
+            Files.copy(is, Paths.get(outputPath), StandardCopyOption.REPLACE_EXISTING);
         }
     }
 

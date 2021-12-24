@@ -39,7 +39,7 @@ public class AssigningTable {
     public static final int MARK_COL_START = 1;
 
     private final XSSFSheet assigningSheet;
-    private XSSFWorkbook wb;
+    private final XSSFWorkbook wb;
     private final Notifier notifier;
     private double[][] allReqrStageNums;
     private boolean[] isIntegers;
@@ -55,10 +55,13 @@ public class AssigningTable {
             wb = new XSSFWorkbook(pkg);
         } catch (InvalidFormatException e) {
             this.notifier.notify(AMEvent.ERROR_AT_INCORRECT_FORMAT);
+            throw new RuntimeException(e);
         } catch (FileNotFoundException e) {
             this.notifier.notify(AMEvent.ERROR_AT_NOT_FOUND);
+            throw new RuntimeException(e);
         } catch (IOException e) {
             this.notifier.notify(AMEvent.ERROR_READING_AT);
+            throw new RuntimeException(e);
         }
         assigningSheet = wb.getSheetAt(0);
     }
@@ -90,7 +93,7 @@ public class AssigningTable {
             try {
                 wb.close();
             } catch (IOException ioException) {
-                ioException.printStackTrace();
+                throw new RuntimeException(ioException);
             }
         }
 
@@ -109,8 +112,9 @@ public class AssigningTable {
                     try {
                         wb.close();
                     } catch (IOException ioException) {
-                        ioException.printStackTrace();
+                        throw new RuntimeException(ioException);
                     }
+                    throw new RuntimeException(e);
                 }
         }
 
@@ -126,13 +130,14 @@ public class AssigningTable {
                         allReqrStageNums[i][r] = 0;
                     else {
                         t = Double.parseDouble(formatter.formatCellValue(c));
-                        if (t > -1 && t < 0) //处理负数
+                        if (t > -1 && t < 0) // 处理负数
                             throw new IncorrectSheetException();
                         allReqrStageNums[i][r] = t;
                     }
                 }
         } catch (IncorrectSheetException | NumberFormatException e) {
             notifier.notify(AMEvent.ERROR_AT_INCORRECT_FORMAT);
+            throw new RuntimeException(e);
         } finally {
             try {
                 wb.close();
@@ -140,6 +145,15 @@ public class AssigningTable {
                 ioException.printStackTrace();
             }
         }
+    }
+
+    /**
+     * 请使用此方法结束线程池
+     *
+     * @return true - 成功关闭, false - 已关闭
+     */
+    public boolean shutdownNotifier() {
+        return notifier.shutdown();
     }
 
     int[] getReqrStageNums(int subject, int validPersons) {

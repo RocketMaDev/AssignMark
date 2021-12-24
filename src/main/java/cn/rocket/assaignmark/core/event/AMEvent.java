@@ -30,7 +30,8 @@ public enum AMEvent {
     ERROR_MT_INCORRECT_FORMAT(40),
     ERROR_INVALID_OUTPUT_PATH(41),
     ERROR_FAILED_TO_WRITE(42),
-    ERROR_UNEXPECTED(43);
+    ERROR_MT_EMPTY(43),
+    ERROR_UNEXPECTED(44);
 
     private final int index;
 
@@ -38,8 +39,8 @@ public enum AMEvent {
         this.index = index;
     }
 
-    public int getIndex(AMEvent event) {
-        return event.index;
+    public int getIndex() {
+        return this.index;
     }
 
     public static AMEvent getIndexAt(int index) {
