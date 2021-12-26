@@ -1,6 +1,6 @@
 package cn.rocket.assaignmark.core.exception;
 
-public class EmptyMarkTableException extends Exception {
+public class EmptyMarkTableException extends AssigningException {
     public EmptyMarkTableException() {
     }
 

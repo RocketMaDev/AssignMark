@@ -3,6 +3,7 @@ package cn.rocket.assaignmark.core;
 import cn.rocket.assaignmark.core.event.AMEvent;
 import cn.rocket.assaignmark.core.event.AMEventHandler;
 import cn.rocket.assaignmark.core.event.Notifier;
+import cn.rocket.assaignmark.core.exception.AssigningException;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -41,12 +42,15 @@ public class AMFactory {
         try {
             impl_work();
         } catch (Exception e) {
-            notifier.notify(AMEvent.ERROR_UNEXPECTED);
-            e.printStackTrace();
+            if (!(e instanceof AssigningException)) {
+                notifier.notify(AMEvent.ERROR_UNEXPECTED, e.toString());
+                e.printStackTrace();
+            } else
+                notifier.notify(AMEvent.ERROR_UNEXPECTED, e.getCause().getLocalizedMessage());
         }
     }
 
-    public void impl_work() {
+    public void impl_work() throws AssigningException {
         AssigningTable at = new AssigningTable(assigningTablePath, handler, notifier);
         at.checkAndLoad();
         MarkTable mt = new MarkTable(markTablePath, handler, outputPath, at, notifier);

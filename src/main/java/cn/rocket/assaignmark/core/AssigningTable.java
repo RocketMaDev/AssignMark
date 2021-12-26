@@ -3,6 +3,7 @@ package cn.rocket.assaignmark.core;
 import cn.rocket.assaignmark.core.event.AMEvent;
 import cn.rocket.assaignmark.core.event.AMEventHandler;
 import cn.rocket.assaignmark.core.event.Notifier;
+import cn.rocket.assaignmark.core.exception.AssigningException;
 import cn.rocket.assaignmark.core.exception.IncorrectSheetException;
 import cn.rocket.assaignmark.core.exception.InvalidTableException;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
@@ -44,7 +45,7 @@ public class AssigningTable {
     private double[][] allReqrStageNums;
     private boolean[] isIntegers;
 
-    AssigningTable(String wbPath, AMEventHandler handler, Notifier notifier) {
+    AssigningTable(String wbPath, AMEventHandler handler, Notifier notifier) throws AssigningException {
         if (notifier != null)
             this.notifier = notifier;
         else
@@ -55,22 +56,22 @@ public class AssigningTable {
             wb = new XSSFWorkbook(pkg);
         } catch (InvalidFormatException e) {
             this.notifier.notify(AMEvent.ERROR_AT_INCORRECT_FORMAT);
-            throw new RuntimeException(e);
+            throw new AssigningException(e);
         } catch (FileNotFoundException e) {
             this.notifier.notify(AMEvent.ERROR_AT_NOT_FOUND);
-            throw new RuntimeException(e);
+            throw new AssigningException(e);
         } catch (IOException e) {
             this.notifier.notify(AMEvent.ERROR_READING_AT);
-            throw new RuntimeException(e);
+            throw new AssigningException(e);
         }
         assigningSheet = wb.getSheetAt(0);
     }
 
-    public AssigningTable(String wbPath, AMEventHandler handler) {
+    public AssigningTable(String wbPath, AMEventHandler handler) throws AssigningException {
         this(wbPath, handler, null);
     }
 
-    public void checkAndLoad() {
+    public void checkAndLoad() throws AssigningException {
         if (allReqrStageNums != null)
             return;
         notifier.notify(AMEvent.CHECK_AT);
@@ -93,8 +94,9 @@ public class AssigningTable {
             try {
                 wb.close();
             } catch (IOException ioException) {
-                throw new RuntimeException(ioException);
+                ioException.printStackTrace();
             }
+            throw new AssigningException(e);
         }
 
 
@@ -102,19 +104,19 @@ public class AssigningTable {
         Row boolRow = assigningSheet.getRow(BOOL_ROW);
         for (int i = 0; i < SUBJECTS; i++) {
             c = boolRow.getCell(i + MARK_COL_START, Row.MissingCellPolicy.RETURN_NULL_AND_BLANK);
-            if (c.getCellType().equals(CellType.BOOLEAN))
+            if (c != null && c.getCellType().equals(CellType.BOOLEAN))
                 isIntegers[i] = c.getBooleanCellValue();
             else
                 try {
                     throw new IncorrectSheetException();
                 } catch (IncorrectSheetException e) {
-                    notifier.notify(AMEvent.ERROR_AT_INVALID_FORMAT);
+                    notifier.notify(AMEvent.ERROR_AT_INCORRECT_FORMAT);
                     try {
                         wb.close();
                     } catch (IOException ioException) {
-                        throw new RuntimeException(ioException);
+                        ioException.printStackTrace();
                     }
-                    throw new RuntimeException(e);
+                    throw new AssigningException(e);
                 }
         }
 
@@ -126,7 +128,7 @@ public class AssigningTable {
             for (int i = 0; i < SUBJECTS; i++)
                 for (int r = 0; r < STAGES; r++) {
                     c = rows[r].getCell(MARK_COL_START + i, Row.MissingCellPolicy.RETURN_NULL_AND_BLANK);
-                    if (!c.getCellType().equals(CellType.NUMERIC))
+                    if (c == null || !c.getCellType().equals(CellType.NUMERIC))
                         allReqrStageNums[i][r] = 0;
                     else {
                         t = Double.parseDouble(formatter.formatCellValue(c));
@@ -137,7 +139,7 @@ public class AssigningTable {
                 }
         } catch (IncorrectSheetException | NumberFormatException e) {
             notifier.notify(AMEvent.ERROR_AT_INCORRECT_FORMAT);
-            throw new RuntimeException(e);
+            throw new AssigningException(e);
         } finally {
             try {
                 wb.close();

@@ -20,6 +20,8 @@ public class Notifier {
     }
 
     public void notify(AMEvent event, String msg) {
+        if (event.getIndex() == 44 && executor.isShutdown()) // 44:ERROR_UNEXPECTED
+            return;
         if (handler != null)
             executor.execute(() -> handler.handle(event, msg));
         else if (msg != null)

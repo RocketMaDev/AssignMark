@@ -1,6 +1,6 @@
 package cn.rocket.assaignmark.core.exception;
 
-public class InvalidTableException extends Exception {
+public class InvalidTableException extends AssigningException {
 
     public InvalidTableException() {
     }

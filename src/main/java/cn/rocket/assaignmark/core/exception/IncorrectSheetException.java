@@ -4,7 +4,7 @@ package cn.rocket.assaignmark.core.exception;
  * @author Rocket
  * @version 0.9-pre
  */
-public class IncorrectSheetException extends Exception {
+public class IncorrectSheetException extends AssigningException {
     public IncorrectSheetException() {
     }
 

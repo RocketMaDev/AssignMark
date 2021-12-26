@@ -40,7 +40,7 @@ public enum AMEvent {
     }
 
     public int getIndex() {
-        return this.index;
+        return index;
     }
 
     public static AMEvent getIndexAt(int index) {
