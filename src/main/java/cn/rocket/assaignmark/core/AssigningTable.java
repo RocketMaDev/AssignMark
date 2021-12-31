@@ -55,13 +55,13 @@ public class AssigningTable {
             OPCPackage pkg = OPCPackage.open(new FileInputStream(wbPath));
             wb = new XSSFWorkbook(pkg);
         } catch (InvalidFormatException e) {
-            this.notifier.notify(AMEvent.ERROR_AT_INCORRECT_FORMAT);
+            this.notifier.notify(AMEvent.ERR_AT_INCORRECT_FORMAT);
             throw new AssigningException(e);
         } catch (FileNotFoundException e) {
-            this.notifier.notify(AMEvent.ERROR_AT_NOT_FOUND);
+            this.notifier.notify(AMEvent.ERR_AT_NOT_FOUND);
             throw new AssigningException(e);
         } catch (IOException e) {
-            this.notifier.notify(AMEvent.ERROR_READING_AT);
+            this.notifier.notify(AMEvent.ERR_READING_AT);
             throw new AssigningException(e);
         }
         assigningSheet = wb.getSheetAt(0);
@@ -90,7 +90,7 @@ public class AssigningTable {
             if (c == null || !formatter.formatCellValue(c).equals("Rocket"))
                 throw new InvalidTableException();
         } catch (InvalidTableException e) {
-            notifier.notify(AMEvent.ERROR_INVALID_AT);
+            notifier.notify(AMEvent.ERR_INVALID_AT);
             try {
                 wb.close();
             } catch (IOException ioException) {
@@ -110,7 +110,7 @@ public class AssigningTable {
                 try {
                     throw new IncorrectSheetException();
                 } catch (IncorrectSheetException e) {
-                    notifier.notify(AMEvent.ERROR_AT_INCORRECT_FORMAT);
+                    notifier.notify(AMEvent.ERR_AT_INCORRECT_FORMAT);
                     try {
                         wb.close();
                     } catch (IOException ioException) {
@@ -138,7 +138,7 @@ public class AssigningTable {
                     }
                 }
         } catch (IncorrectSheetException | NumberFormatException e) {
-            notifier.notify(AMEvent.ERROR_AT_INCORRECT_FORMAT);
+            notifier.notify(AMEvent.ERR_AT_INCORRECT_FORMAT);
             throw new AssigningException(e);
         } finally {
             try {

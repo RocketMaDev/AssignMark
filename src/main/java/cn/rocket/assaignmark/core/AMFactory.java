@@ -1,5 +1,6 @@
 package cn.rocket.assaignmark.core;
 
+import cn.rocket.assaignmark.LocalURL;
 import cn.rocket.assaignmark.core.event.AMEvent;
 import cn.rocket.assaignmark.core.event.AMEventHandler;
 import cn.rocket.assaignmark.core.event.Notifier;
@@ -16,7 +17,6 @@ import java.nio.file.StandardCopyOption;
  * @version 0.9-pre
  */
 public class AMFactory {
-    public static final String TEMPLATE_PATH = "/amres/core/template.xlsx";
     private final String assigningTablePath;
     private final String markTablePath;
     private final AMEventHandler handler;
@@ -32,7 +32,7 @@ public class AMFactory {
     }
 
     public static void extractTable(String outputPath) throws IOException {
-        try (InputStream is = AMFactory.class.getResourceAsStream(TEMPLATE_PATH)) {
+        try (InputStream is = AMFactory.class.getResourceAsStream(LocalURL.TEMPLATE_PATH)) {
             assert is != null;
             Files.copy(is, Paths.get(outputPath), StandardCopyOption.REPLACE_EXISTING);
         }
@@ -43,7 +43,7 @@ public class AMFactory {
             impl_work();
         } catch (AssigningException ignored) {
         } catch (Exception e) {
-            notifier.notify(AMEvent.ERROR_UNEXPECTED, e.toString());
+            notifier.notify(AMEvent.ERR_UNEXPECTED, e.toString());
             e.printStackTrace();
         }
     }

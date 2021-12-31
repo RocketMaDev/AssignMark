@@ -1,5 +1,6 @@
 package cn.rocket.assaignmark.cmd;
 
+import cn.rocket.assaignmark.LocalURL;
 import cn.rocket.assaignmark.core.AMFactory;
 import cn.rocket.assaignmark.core.event.AMEventHandler;
 import cn.rocket.assaignmark.gui.Launcher;
@@ -9,7 +10,6 @@ import org.apache.commons.cli.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.Scanner;
 
 /**
@@ -17,8 +17,6 @@ import java.util.Scanner;
  * @version 0.9-pre
  */
 public class Main {
-    public static final String JAR_PATH; // with /
-    public static final String JAR_PARENT_PATH; // with /
     private static final String[] msgList = {"正在加载赋分表...", "正在检查赋分表...", "正在加载分数表", "正在检查分数表",
             "正在赋分 政治", "正在赋分 历史", "正在赋分 地理", "正在赋分 物理", "正在赋分 化学", "正在赋分 生物", "正在赋分 技术",
             "正在导出", "完成！",
@@ -27,18 +25,6 @@ public class Main {
             "错误： 未找到分数表", "错误： 无法读取分数表", "错误： 分数表不是标准xlsx表格", "错误： 分数表格式不符合规范！请查阅说明",
             "错误： 非法的导出路径", "错误： 写出失败！请确保导出表格没有在Excel等应用中打开", "错误： 分数表必须包含可赋分的工作表",
             "错误： 未在意料中的错误"};
-
-    static {
-        String jarPath;
-        try {
-            jarPath = Main.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath();
-        } catch (URISyntaxException e) {
-            jarPath = null;
-            System.err.println("无法解析jar路径！");
-        }
-        JAR_PATH = jarPath;
-        JAR_PARENT_PATH = new File(JAR_PATH).getParent() + "/";
-    }
 
     public static void main(String[] args) {
         if (args == null || args.length == 0) {
@@ -69,10 +55,10 @@ public class Main {
                 return;
             } else if (cl.hasOption("e")) {
                 try {
-                    File file = new File(JAR_PARENT_PATH + "赋分表.xlsx");
+                    File file = new File(LocalURL.JAR_PARENT_PATH + "赋分表.xlsx");
                     if (file.exists())
                         for (int i = 0; i < 10; i++) {
-                            file = new File(JAR_PARENT_PATH + "赋分表" + i + ".xlsx");
+                            file = new File(LocalURL.JAR_PARENT_PATH + "赋分表" + i + ".xlsx");
                             if (!file.exists())
                                 break;
                         }
@@ -112,8 +98,7 @@ public class Main {
             handleException(e, null);
         }
         AMEventHandler handler = (e, msg) -> {
-            int index = e.getIndex();
-            System.out.println(index <= 12 ? msgList[index] : msgList[index - 19]); // 关于19，详见AMEvent
+            System.out.println(msgList[e.ordinal()]);
             if (msg != null)
                 System.out.println("错误提示：" + msg);
         };

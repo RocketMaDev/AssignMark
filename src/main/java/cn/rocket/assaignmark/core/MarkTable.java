@@ -54,13 +54,13 @@ public class MarkTable {
             OPCPackage pkg = OPCPackage.open(new FileInputStream(wbPath));
             markWorkbook = new XSSFWorkbook(pkg);
         } catch (FileNotFoundException e) {
-            notifier.notify(AMEvent.ERROR_MT_NOT_FOUND);
+            notifier.notify(AMEvent.ERR_MT_NOT_FOUND);
             throw new AssigningException(e);
         } catch (InvalidFormatException e) {
-            notifier.notify(AMEvent.ERROR_READING_AT);
+            notifier.notify(AMEvent.ERR_READING_AT);
             throw new AssigningException(e);
         } catch (IOException e) {
-            notifier.notify(AMEvent.ERROR_READING_MT);
+            notifier.notify(AMEvent.ERR_READING_MT);
             throw new AssigningException(e);
         }
     }
@@ -208,7 +208,7 @@ public class MarkTable {
                 } catch (IOException ioException) {
                     ioException.printStackTrace();
                 }
-                notifier.notify(AMEvent.ERROR_MT_INCORRECT_FORMAT);
+                notifier.notify(AMEvent.ERR_MT_INCORRECT_FORMAT);
                 throw new AssigningException(e);
             }
         }
@@ -242,7 +242,7 @@ public class MarkTable {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            notifier.notify(AMEvent.ERROR_MT_EMPTY);
+            notifier.notify(AMEvent.ERR_MT_EMPTY);
             throw new AssigningException(new EmptyMarkTableException());
         }
         for (int i = 0; i < SUBJECTS; i++) {
@@ -257,10 +257,10 @@ public class MarkTable {
         try (FileOutputStream out = new FileOutputStream(outputPath)) {
             markWorkbook.write(out);
         } catch (FileNotFoundException e) {
-            notifier.notify(AMEvent.ERROR_INVALID_OUTPUT_PATH);
+            notifier.notify(AMEvent.ERR_INVALID_OUTPUT_PATH);
             throw new AssigningException(e);
         } catch (IOException e) {
-            notifier.notify(AMEvent.ERROR_FAILED_TO_WRITE);
+            notifier.notify(AMEvent.ERR_FAILED_TO_WRITE);
             throw new AssigningException(e);
         } finally {
             try {

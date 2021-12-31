@@ -9,9 +9,12 @@ import java.util.concurrent.Executors;
  */
 public class Notifier {
     private final AMEventHandler handler;
-    private final ExecutorService executor = Executors.newSingleThreadExecutor();
+    private final ExecutorService executor;
+    private final boolean isNull;
 
     public Notifier(AMEventHandler handler) {
+        executor = handler == null ? null : Executors.newSingleThreadExecutor();
+        isNull = handler == null;
         this.handler = handler;
     }
 
@@ -20,18 +23,20 @@ public class Notifier {
     }
 
     public void notify(AMEvent event, String msg) {
-        if (event.getIndex() == 44 && executor.isShutdown()) // 44:ERROR_UNEXPECTED
+        if (isNull)
+            return;
+        if (event.getIndex() == AMEvent.ERR_UNEXPECTED.getIndex() && executor.isShutdown())
             return;
         if (handler != null)
             executor.execute(() -> handler.handle(event, msg));
         else if (msg != null)
             System.out.println("Notifier:" + msg);
-        if (event.getIndex() >= 32) // 32:ERROR_AT_NOT_FOUND
+        if (event.getIndex() >= AMEvent.ERR_AT_NOT_FOUND.getIndex())
             executor.shutdown();
     }
 
     public boolean shutdown() {
-        if (executor.isShutdown())
+        if (isNull || executor.isShutdown())
             return false;
         executor.shutdown();
         return true;

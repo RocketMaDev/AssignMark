@@ -19,19 +19,19 @@ public enum AMEvent {
     WRITE_OUT(11),
     DONE(12),
 
-    ERROR_AT_NOT_FOUND(32),
-    ERROR_READING_AT(33),
-    ERROR_AT_INVALID_FORMAT(34),
-    ERROR_AT_INCORRECT_FORMAT(35),
-    ERROR_INVALID_AT(36),
-    ERROR_MT_NOT_FOUND(37),
-    ERROR_READING_MT(38),
-    ERROR_MT_INVALID_FORMAT(39),
-    ERROR_MT_INCORRECT_FORMAT(40),
-    ERROR_INVALID_OUTPUT_PATH(41),
-    ERROR_FAILED_TO_WRITE(42),
-    ERROR_MT_EMPTY(43),
-    ERROR_UNEXPECTED(44);
+    ERR_AT_NOT_FOUND(32),
+    ERR_READING_AT(33),
+    ERR_AT_INVALID_FORMAT(34),
+    ERR_AT_INCORRECT_FORMAT(35),
+    ERR_INVALID_AT(36),
+    ERR_MT_NOT_FOUND(37),
+    ERR_READING_MT(38),
+    ERR_MT_INVALID_FORMAT(39),
+    ERR_MT_INCORRECT_FORMAT(40),
+    ERR_INVALID_OUTPUT_PATH(41),
+    ERR_FAILED_TO_WRITE(42),
+    ERR_MT_EMPTY(43),
+    ERR_UNEXPECTED(44);
 
     private final int index;
 
@@ -44,11 +44,11 @@ public enum AMEvent {
     }
 
     public static AMEvent getIndexAt(int index) {
-        if (index < 0 || index > ERROR_UNEXPECTED.index || index > DONE.index && index < ERROR_AT_NOT_FOUND.index)
+        if (index < 0 || index > ERR_UNEXPECTED.index || index > DONE.index && index < ERR_AT_NOT_FOUND.index)
             throw new IllegalArgumentException("未知索引");
         if (index <= DONE.index)
             return AMEvent.values()[index];
         else
-            return AMEvent.values()[index - ERROR_AT_NOT_FOUND.index + DONE.index + 1];
+            return AMEvent.values()[index - ERR_AT_NOT_FOUND.index + DONE.index + 1];
     }
 }
