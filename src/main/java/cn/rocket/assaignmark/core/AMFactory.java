@@ -41,12 +41,10 @@ public class AMFactory {
     public void work() {
         try {
             impl_work();
+        } catch (AssigningException ignored) {
         } catch (Exception e) {
-            if (!(e instanceof AssigningException)) {
-                notifier.notify(AMEvent.ERROR_UNEXPECTED, e.toString());
-                e.printStackTrace();
-            } else
-                notifier.notify(AMEvent.ERROR_UNEXPECTED, e.getCause().getLocalizedMessage());
+            notifier.notify(AMEvent.ERROR_UNEXPECTED, e.toString());
+            e.printStackTrace();
         }
     }
 
