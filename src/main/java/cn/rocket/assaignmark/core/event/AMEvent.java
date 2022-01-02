@@ -1,8 +1,10 @@
 package cn.rocket.assaignmark.core.event;
 
 /**
+ * 赋分事件枚举
+ *
  * @author Rocket
- * @version 0.9-pre
+ * @version 0.9.8
  */
 public enum AMEvent {
     LOAD_AT(0),
@@ -28,21 +30,31 @@ public enum AMEvent {
     ERR_READING_MT(38),
     ERR_MT_INVALID_FORMAT(39),
     ERR_MT_INCORRECT_FORMAT(40),
-    ERR_INVALID_OUTPUT_PATH(41),
-    ERR_FAILED_TO_WRITE(42),
-    ERR_MT_EMPTY(43),
-    ERR_UNEXPECTED(44);
+    ERR_FAILED_TO_WRITE(41),
+    ERR_MT_EMPTY(42),
+    ERR_UNEXPECTED(43);
 
+    /**
+     * 每个事件的索引
+     */
     private final int index;
 
+    /**
+     * 构造函数。
+     *
+     * @param index 每个事件的索引
+     */
     AMEvent(int index) {
         this.index = index;
     }
 
-    public int getIndex() {
-        return index;
-    }
-
+    /**
+     * 获取对应索引的事件（枚举项）。当没有索引对应的事件时，抛出<code>IllegalArgumentException</code>
+     *
+     * @param index 需要寻找的索引
+     * @return 对应索引的事件（枚举项）
+     * @see IllegalArgumentException
+     */
     public static AMEvent getIndexAt(int index) {
         if (index < 0 || index > ERR_UNEXPECTED.index || index > DONE.index && index < ERR_AT_NOT_FOUND.index)
             throw new IllegalArgumentException("未知索引");
@@ -50,5 +62,14 @@ public enum AMEvent {
             return AMEvent.values()[index];
         else
             return AMEvent.values()[index - ERR_AT_NOT_FOUND.index + DONE.index + 1];
+    }
+
+    /**
+     * 返回索引
+     *
+     * @return 当前对象的索引
+     */
+    public int getIndex() {
+        return index;
     }
 }

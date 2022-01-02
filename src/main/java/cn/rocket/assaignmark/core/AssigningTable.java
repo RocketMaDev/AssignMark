@@ -15,13 +15,17 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
 /**
+ * 赋分表类
+ * 用来存储赋分比例信息
+ *
  * @author Rocket
- * @version 0.9-pre
+ * @version 0.9.8
  */
 public class AssigningTable {
     public static final int SUBJECTS = 7;
@@ -43,39 +47,77 @@ public class AssigningTable {
     private final XSSFWorkbook wb;
     private final Notifier notifier;
     private double[][] allReqrStageNums;
-    private boolean[] isIntegers;
+    private boolean[] isRatios;
 
-    AssigningTable(String wbPath, AMEventHandler handler, Notifier notifier) throws AssigningException {
-        if (notifier != null)
-            this.notifier = notifier;
+    /**
+     * 构造一个赋分表实例，并允许使用给定的<code>notifier</code>，前提是继承该类。
+     * 若只是将其与分数表两两捆绑使用，请考虑<code>AMFactory</code>
+     * <p>
+     * 所有参数基本不可为<code>null</code>
+     * <p>
+     * <i>这儿的水很深，你把握不住。</i>
+     *
+     * @param wbPath    赋分表路径
+     * @param handler   <code>AMEvent</code>事件处理器实例，<i>此项可为<code>null</code></i>
+     * @param _notifier 事件唤醒器实例
+     * @throws AssigningException 如果赋分表无法加载
+     * @see AMFactory
+     * @see AMEvent
+     * @see AMEventHandler
+     */
+    protected AssigningTable(String wbPath, AMEventHandler handler, Notifier _notifier) throws AssigningException {
+        if (_notifier != null)
+            notifier = _notifier;
         else
-            this.notifier = new Notifier(handler);
-        this.notifier.notify(AMEvent.LOAD_AT);
+            notifier = new Notifier(handler);
+        notifier.notify(AMEvent.LOAD_AT);
         try {
+            if (new File(wbPath).length() > 1024 * 1024) {// 1MiB
+                notifier.notify(AMEvent.ERR_INVALID_AT);
+                throw new AssigningException();
+            }
             OPCPackage pkg = OPCPackage.open(new FileInputStream(wbPath));
             wb = new XSSFWorkbook(pkg);
         } catch (InvalidFormatException e) {
-            this.notifier.notify(AMEvent.ERR_AT_INCORRECT_FORMAT);
+            notifier.notify(AMEvent.ERR_AT_INCORRECT_FORMAT);
             throw new AssigningException(e);
         } catch (FileNotFoundException e) {
-            this.notifier.notify(AMEvent.ERR_AT_NOT_FOUND);
+            notifier.notify(AMEvent.ERR_AT_NOT_FOUND);
             throw new AssigningException(e);
         } catch (IOException e) {
-            this.notifier.notify(AMEvent.ERR_READING_AT);
+            notifier.notify(AMEvent.ERR_READING_AT);
             throw new AssigningException(e);
         }
         assigningSheet = wb.getSheetAt(0);
     }
 
+    /**
+     * 构造一个赋分表实例，如果你想单独使用它的话，或想获得对其生命周期的完全控制。
+     * <p>
+     * <b>切记使用完毕后调用<code>shutdownNotifier()</code>来关闭线程池</b>
+     * <p>
+     * 所有参数基本不可为<code>null</code>
+     *
+     * @param wbPath  赋分表路径
+     * @param handler <code>AMEvent</code>事件处理器实例，<i>此项可为<code>null</code></i>
+     * @throws AssigningException 如果赋分表无法加载
+     * @see AMEvent
+     * @see AMEventHandler
+     */
     public AssigningTable(String wbPath, AMEventHandler handler) throws AssigningException {
         this(wbPath, handler, null);
     }
 
+    /**
+     * 检查并加载赋分比例
+     *
+     * @throws AssigningException 在检查读取赋分比例时出现了异常
+     */
     public void checkAndLoad() throws AssigningException {
         if (allReqrStageNums != null)
             return;
         notifier.notify(AMEvent.CHECK_AT);
-        isIntegers = new boolean[STAGES];
+        isRatios = new boolean[SUBJECTS];
         allReqrStageNums = new double[SUBJECTS][STAGES];
         DataFormatter formatter = new DataFormatter();
         Cell c;
@@ -105,7 +147,7 @@ public class AssigningTable {
         for (int i = 0; i < SUBJECTS; i++) {
             c = boolRow.getCell(i + MARK_COL_START, Row.MissingCellPolicy.RETURN_NULL_AND_BLANK);
             if (c != null && c.getCellType().equals(CellType.BOOLEAN))
-                isIntegers[i] = c.getBooleanCellValue();
+                isRatios[i] = c.getBooleanCellValue();
             else
                 try {
                     throw new IncorrectSheetException();
@@ -158,6 +200,13 @@ public class AssigningTable {
         return notifier.shutdown();
     }
 
+    /**
+     * 获取对应科目的赋分分段实际人数
+     *
+     * @param subject      科目
+     * @param validPersons 有效人数（当赋分表内是人数而非比例时，该数无效
+     * @return <code>int[]</code> - 选定科目各个赋分分段实际人数
+     */
     int[] getReqrStageNums(int subject, int validPersons) {
         if (subject < 0 || subject > SUBJECTS)
             throw new RuntimeException("var subject should in the range");
@@ -165,15 +214,21 @@ public class AssigningTable {
             throw new NullPointerException("please first run checkAndLoad() before invoke this method.");
         double[] in = allReqrStageNums[subject];
         int[] out = new int[STAGES];
-        if (isIntegers[subject])
-            for (int i = 0; i < STAGES; i++)
-                out[i] = (int) in[i];
-        else
+        if (isRatios[subject])
             for (int i = 0; i < STAGES; i++)
                 out[i] = Math.toIntExact(in[i] == -1.0 ? -1 : Math.round(in[i] * validPersons));
+        else
+            for (int i = 0; i < STAGES; i++)
+                out[i] = (int) in[i];
+
         return out;
     }
 
+    /**
+     * 检查该赋分表实例是否已加载完毕
+     *
+     * @return 是否加载完毕
+     */
     boolean isNotLoaded() {
         return allReqrStageNums == null;
     }

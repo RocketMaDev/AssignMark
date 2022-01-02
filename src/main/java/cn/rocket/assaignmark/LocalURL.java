@@ -6,10 +6,12 @@ import java.io.File;
 import java.net.URISyntaxException;
 
 /**
+ * 程序中存放资源地址的工具类
+ *
  * @author Rocket
- * @version 0.9-pre
+ * @version 0.9.8
  */
-public class LocalURL {
+public final class LocalURL {
     // Jar associated
     public static final String JAR_PATH; // with /
     public static final String JAR_PARENT_PATH; // with /

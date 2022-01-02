@@ -11,24 +11,26 @@ import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 
 import static cn.rocket.assaignmark.core.AssigningTable.*;
 
 /**
+ * 分数表类
+ * 用来进行赋分
+ *
  * @author Rocket
- * @version 0.9-pre
+ * @version 0.9.8
  */
 public class MarkTable {
     public static final int ROW_LIMIT = 10;
     public static final int COL_LIMIT = 5;
+
     public static final int VALID_PERSONS = 0;
     public static final int MARK_COL = 1;
     public static final int ASSIGNING_COL = 2;
     public static final int START_ROW = 3;
+
     public static final int INFO_COUNT = 4;
 
     private double[][] allMarks;
@@ -39,25 +41,48 @@ public class MarkTable {
     private final String outputPath;
     private final AssigningTable assigningTable;
 
-    MarkTable(String wbPath, AMEventHandler handler, String outputPath, AssigningTable assigningTable, Notifier notifier) throws AssigningException {
-        if (notifier != null)
-            this.notifier = notifier;
+    /**
+     * 构造一个分数表实例，并允许使用给定的<code>notifier</code>，前提是继承该类。
+     * 若只是将其与赋分表两两捆绑使用，请考虑<code>AMFactory</code>
+     * <p>
+     * 所有参数基本不可为<code>null</code>
+     * <p>
+     * <i>这儿的水很深，你把握不住。</i>
+     *
+     * @param wbPath         分数表路径
+     * @param handler        <code>AMEvent</code>事件处理器实例，<i>此项可为<code>null</code></i>
+     * @param outputPath     输出赋分完毕的分数表路径
+     * @param assigningTable 赋分表实例
+     * @param _notifier      事件唤醒器实例
+     * @throws AssigningException 如果分数表无法加载
+     * @see AMFactory
+     * @see AMEvent
+     * @see AMEventHandler
+     */
+    protected MarkTable(String wbPath, AMEventHandler handler, String outputPath, AssigningTable assigningTable, Notifier _notifier) throws AssigningException {
+        if (_notifier != null)
+            notifier = _notifier;
         else
-            this.notifier = new Notifier(handler);
+            notifier = new Notifier(handler);
         if (assigningTable == null || assigningTable.isNotLoaded())
             throw new NullPointerException("assigningTable can not null or empty!");
         this.assigningTable = assigningTable;
         this.outputPath = outputPath;
-        notifier = new Notifier(handler);
         notifier.notify(AMEvent.LOAD_MT);
         try {
-            OPCPackage pkg = OPCPackage.open(new FileInputStream(wbPath));
+            File wbFile = new File(wbPath);
+            OPCPackage pkg;
+            // 处理大型xlsx表格
+            if (wbFile.length() < 20 * 1024 * 1024) // 20MiB
+                pkg = OPCPackage.open(wbFile);
+            else
+                pkg = OPCPackage.open(new FileInputStream(wbFile));
             markWorkbook = new XSSFWorkbook(pkg);
         } catch (FileNotFoundException e) {
             notifier.notify(AMEvent.ERR_MT_NOT_FOUND);
             throw new AssigningException(e);
         } catch (InvalidFormatException e) {
-            notifier.notify(AMEvent.ERR_READING_AT);
+            notifier.notify(AMEvent.ERR_MT_INVALID_FORMAT);
             throw new AssigningException(e);
         } catch (IOException e) {
             notifier.notify(AMEvent.ERR_READING_MT);
@@ -65,17 +90,34 @@ public class MarkTable {
         }
     }
 
+    /**
+     * 构造一个分数表实例，如果你想单独使用它的话。
+     * <p>
+     * <b>线程池的<code>shutdown()</code>将在赋分完毕的分数表后自动调用</b>
+     * <p>
+     * 所有参数基本不可为<code>null</code>
+     *
+     * @param wbPath         分数表路径
+     * @param handler        <code>AMEvent</code>事件处理器实例，<i>此项可为<code>null</code></i>
+     * @param outputPath     输出赋分完毕的分数表路径
+     * @param assigningTable 赋分表实例
+     * @throws AssigningException 如果分数表无法加载
+     * @see AMEvent
+     * @see AMEventHandler
+     */
     public MarkTable(String wbPath, AMEventHandler handler, String outputPath, AssigningTable assigningTable) throws AssigningException {
         this(wbPath, handler, outputPath, assigningTable, null);
     }
 
     /**
-     * flag:1:只找到原分，2:只找到赋分
+     * 读取工作表信息：赋分栏,分数栏,分数起始行,有效人数
      *
      * @param sheet   查找的表格
      * @param subject 表格对应的科目
+     * @throws IncorrectSheetException 如果找不到赋分或原分栏或找不到原分起始行
      */
     private void readSheetInfos(Sheet sheet, int subject) throws IncorrectSheetException {
+        // flag:1:只找到原分，2:只找到赋分
         int flag = 0;
         int[] infos = allSheetInfos[subject];
         DataFormatter formatter = new DataFormatter();
@@ -108,10 +150,10 @@ public class MarkTable {
                 offset++;
             }
         }
-        if (flag != -3)
+        if (flag != 3)
             throw new IncorrectSheetException("找不到赋分或原分栏");
         hp = infos[MARK_COL];
-        for (int i = vp + 1; i < vp; i++) {
+        for (int i = vp + 1; i < vp + ROW_LIMIT; i++) {
             row = sheet.getRow(i);
             if (row == null)
                 continue;
@@ -122,7 +164,7 @@ public class MarkTable {
             }
         }
         if (infos[START_ROW] == 0)
-            throw new IncorrectSheetException("找不到原分");
+            throw new IncorrectSheetException("找不到原分起始行");
 
         vp = infos[START_ROW];
         hp = infos[MARK_COL];
@@ -136,6 +178,13 @@ public class MarkTable {
         infos[VALID_PERSONS] = vp - infos[START_ROW];
     }
 
+    /**
+     * 读取分数
+     *
+     * @param sheet   查找的表格
+     * @param subject 表格对应的科目
+     * @throws IncorrectSheetException 如果非分数或分数小于零
+     */
     private void readMarks(Sheet sheet, int subject) throws IncorrectSheetException {
         int[] infos = allSheetInfos[subject];
         double n;
@@ -160,11 +209,18 @@ public class MarkTable {
         }
     }
 
+    /**
+     * 检查分数表并加载分数表信息和分数
+     *
+     * @throws AssigningException 在检查或读取分数时出现了异常
+     * @see MarkTable#readMarks(Sheet, int)
+     * @see MarkTable#readSheetInfos(Sheet, int)
+     */
     public void checkAndLoad() throws AssigningException {
         if (allMarks != null) {
             return;
         }
-        notifier.notify(AMEvent.LOAD_MT);
+        notifier.notify(AMEvent.CHECK_MT);
         allMarks = new double[SUBJECTS][];
         markSheets = new Sheet[SUBJECTS];
         allSheetInfos = new int[SUBJECTS][INFO_COUNT];
@@ -199,7 +255,7 @@ public class MarkTable {
             if (markSheets[i] == null)
                 continue;
             try {
-                notifier.notify(AMEvent.getIndexAt(4 + i)); // 4:ASSIGN_POLITICS.index
+                notifier.notify(AMEvent.getIndexAt(AMEvent.ASSIGN_POLITICS.getIndex() + i));
                 readSheetInfos(markSheets[i], i);
                 readMarks(markSheets[i], i);
             } catch (IncorrectSheetException e) {
@@ -214,6 +270,12 @@ public class MarkTable {
         }
     }
 
+    /**
+     * 写出赋分完毕的单科分数表到内存
+     *
+     * @param subject       科目
+     * @param assignedMarks 赋分完毕的数组
+     */
     private void writeAssignedMarks(int subject, int[] assignedMarks) {
         Sheet sheet = markSheets[subject];
         int hp = allSheetInfos[subject][ASSIGNING_COL];
@@ -222,10 +284,18 @@ public class MarkTable {
         Row row;
         for (int i = 0; i < length; i++) {
             row = sheet.getRow(i + vp);
-            row.getCell(hp, Row.MissingCellPolicy.RETURN_NULL_AND_BLANK).setCellValue(assignedMarks[i]);
+            row.getCell(hp, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).setCellValue(assignedMarks[i]);
         }
     }
 
+    /**
+     * 输出赋分完毕的分数表到指定路径
+     * <p>
+     * 请先执行<code>checkAndLoad()</code>。
+     *
+     * @throws AssigningException 如果出现IO异常，如文档已打开
+     * @see MarkTable#checkAndLoad()
+     */
     public void calcAssignedMarks() throws AssigningException {
         if (allMarks == null) {
             throw new NullPointerException("please invoke checkAndLoad() first.");
@@ -255,10 +325,11 @@ public class MarkTable {
         }
         notifier.notify(AMEvent.WRITE_OUT);
         try (FileOutputStream out = new FileOutputStream(outputPath)) {
+            File f = new File(outputPath);
+            if (!f.exists())
+                //noinspection ResultOfMethodCallIgnored
+                f.createNewFile();
             markWorkbook.write(out);
-        } catch (FileNotFoundException e) {
-            notifier.notify(AMEvent.ERR_INVALID_OUTPUT_PATH);
-            throw new AssigningException(e);
         } catch (IOException e) {
             notifier.notify(AMEvent.ERR_FAILED_TO_WRITE);
             throw new AssigningException(e);

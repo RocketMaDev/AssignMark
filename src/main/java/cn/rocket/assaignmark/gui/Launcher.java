@@ -5,7 +5,7 @@ import javafx.stage.Stage;
 
 /**
  * @author Rocket
- * @version 0.9-pre
+ * @version 0.9.8
  */
 public class Launcher extends Application {
     @Override

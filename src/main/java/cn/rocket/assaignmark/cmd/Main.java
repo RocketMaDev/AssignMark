@@ -13,19 +13,25 @@ import java.io.IOException;
 import java.util.Scanner;
 
 /**
+ * 主类
+ *
  * @author Rocket
- * @version 0.9-pre
+ * @version 0.9.8
  */
 public class Main {
-    private static final String[] msgList = {"正在加载赋分表...", "正在检查赋分表...", "正在加载分数表", "正在检查分数表",
-            "正在赋分 政治", "正在赋分 历史", "正在赋分 地理", "正在赋分 物理", "正在赋分 化学", "正在赋分 生物", "正在赋分 技术",
-            "正在导出", "完成！",
+    private static final String[] msgList = {"正在加载赋分表...", "正在检查赋分表...", "正在加载分数表...", "正在检查分数表...",
+            "正在赋分 政治 ...", "正在赋分 历史 ...", "正在赋分 地理 ...", "正在赋分 物理 ...", "正在赋分 化学 ...",
+            "正在赋分 生物 ...", "正在赋分 技术 ...", "正在导出...", "完成！",
             "错误： 未找到赋分表", "错误： 无法读取赋分表", "错误： 赋分表不是标准xlsx表格", "错误： 赋分表格式不符合规范！请查阅说明",
             "错误： 未经验证的赋分表！请使用-e参数导出的赋分表",
             "错误： 未找到分数表", "错误： 无法读取分数表", "错误： 分数表不是标准xlsx表格", "错误： 分数表格式不符合规范！请查阅说明",
-            "错误： 非法的导出路径", "错误： 写出失败！请确保导出表格没有在Excel等应用中打开", "错误： 分数表必须包含可赋分的工作表",
-            "错误： 未在意料中的错误"};
+            "错误： 写出失败！非法的导出路径，或无权限写入。请确保导出表格没有在Excel等应用中打开",
+            "错误： 分数表必须包含可赋分的工作表", "错误： 未在意料中的错误"};
 
+    /**
+     * 程序主入口
+     * @param args 外部传入参数
+     */
     public static void main(String[] args) {
         if (args == null || args.length == 0) {
             Application.launch(Launcher.class);
@@ -89,6 +95,7 @@ public class Main {
                 if (!scanner.nextLine().trim().equals("y")) {
                     return;
                 }
+                scanner.close();
             }
 
             outputPath = cl.hasOption('O') ? cl.getOptionValue('O') : markTablePath;
@@ -106,8 +113,15 @@ public class Main {
         new AMFactory(assigningTablePath, markTablePath, handler, outputPath).work();
     }
 
+    /**
+     * 处理主类异常
+     *
+     * @param e    异常实例
+     * @param hint 提示信息
+     */
     private static void handleException(Exception e, String hint) {
-        System.err.println("Error: " + e.toString());
+        System.out.print("错误：");
+        System.err.println(e.toString());
         if (hint != null)
             System.err.println(hint);
         System.exit(0);
