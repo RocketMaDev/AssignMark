@@ -8,7 +8,7 @@ package cn.rocket.assaignmark.core;
  * @author Rocket
  * @version 0.9.8
  */
-public class MarkTarget {
+public final class MarkTarget {
     private final double au;
     private final double ad;
 
