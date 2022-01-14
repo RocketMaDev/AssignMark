@@ -12,6 +12,9 @@ import java.net.URISyntaxException;
  * @version 0.9.8
  */
 public final class LocalURL {
+    private LocalURL() {
+    }
+
     // Jar associated
     public static final String JAR_PATH; // with /
     public static final String JAR_PARENT_PATH; // with /

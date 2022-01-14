@@ -86,7 +86,7 @@ public class Main {
 
             assigningTablePath = cl.getOptionValue('A');
             markTablePath = cl.getOptionValue('I');
-            if (!new File(assigningTablePath).exists() || !new File(markTablePath).exists())
+            if (!AMFactory.defaultGetFile(assigningTablePath).exists() || !AMFactory.defaultGetFile(markTablePath).exists())
                 throw new FileNotFoundException("赋分表或分数表不存在");
 
             if (!cl.hasOption('O')) { // 询问是否覆盖

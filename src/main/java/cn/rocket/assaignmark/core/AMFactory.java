@@ -6,6 +6,7 @@ import cn.rocket.assaignmark.core.event.AMEventHandler;
 import cn.rocket.assaignmark.core.event.Notifier;
 import cn.rocket.assaignmark.core.exception.AssigningException;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -90,5 +91,16 @@ public class AMFactory {
         MarkTable mt = new MarkTable(markTablePath, handler, outputPath, at, notifier);
         mt.checkAndLoad();
         mt.calcAssignedMarks();
+    }
+
+    public static File getFile(String parent, String child) {
+        File file = new File(child);
+        if (file.isAbsolute())
+            return file;
+        return new File(parent, child);
+    }
+
+    public static File defaultGetFile(String path) {
+        return getFile(LocalURL.JAR_PARENT_PATH, path);
     }
 }

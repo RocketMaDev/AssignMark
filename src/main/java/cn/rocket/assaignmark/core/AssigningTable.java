@@ -15,7 +15,6 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -72,11 +71,11 @@ public class AssigningTable {
             notifier = new Notifier(handler);
         notifier.notify(AMEvent.LOAD_AT);
         try {
-            if (new File(wbPath).length() > 1024 * 1024) {// 1MiB
+            if (AMFactory.defaultGetFile(wbPath).length() > 1024 * 1024) { // 1MiB
                 notifier.notify(AMEvent.ERR_INVALID_AT);
                 throw new AssigningException();
             }
-            OPCPackage pkg = OPCPackage.open(new FileInputStream(wbPath));
+            OPCPackage pkg = OPCPackage.open(new FileInputStream(AMFactory.defaultGetFile(wbPath)));
             wb = new XSSFWorkbook(pkg);
         } catch (InvalidFormatException e) {
             notifier.notify(AMEvent.ERR_AT_INCORRECT_FORMAT);

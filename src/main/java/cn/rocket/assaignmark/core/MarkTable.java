@@ -1,6 +1,5 @@
 package cn.rocket.assaignmark.core;
 
-import cn.rocket.assaignmark.LocalURL;
 import cn.rocket.assaignmark.core.event.AMEvent;
 import cn.rocket.assaignmark.core.event.AMEventHandler;
 import cn.rocket.assaignmark.core.event.Notifier;
@@ -71,7 +70,7 @@ public class MarkTable {
         this.outputPath = outputPath;
         notifier.notify(AMEvent.LOAD_MT);
         try {
-            File wbFile = new File(LocalURL.JAR_PARENT_PATH, wbPath);
+            File wbFile = AMFactory.defaultGetFile(wbPath);
             OPCPackage pkg;
             // 处理大型xlsx表格
             if (wbFile.length() < 10 * 1024 * 1024) // 10MiB
@@ -325,8 +324,8 @@ public class MarkTable {
             writeAssignedMarks(i, assignedMarks);
         }
         notifier.notify(AMEvent.WRITE_OUT);
-        try (FileOutputStream out = new FileOutputStream(new File(LocalURL.JAR_PARENT_PATH, outputPath))) {
-            File f = new File(LocalURL.JAR_PARENT_PATH, outputPath);
+        try (FileOutputStream out = new FileOutputStream(AMFactory.defaultGetFile(outputPath))) {
+            File f = AMFactory.defaultGetFile(outputPath);
             if (!f.exists())
                 //noinspection ResultOfMethodCallIgnored
                 f.createNewFile();
