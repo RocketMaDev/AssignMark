@@ -1,7 +1,13 @@
 package cn.rocket.assaignmark.gui;
 
+import cn.rocket.assaignmark.LocalURL;
 import javafx.application.Application;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
+
+import java.io.IOException;
 
 /**
  * @author Rocket
@@ -10,7 +16,17 @@ import javafx.stage.Stage;
 public class Launcher extends Application {
     @Override
     public void start(Stage primaryStage) {
-        System.out.println("尚未完成，请等待未来版本发布");
-        System.exit(0);
+        FXMLLoader loader = new FXMLLoader(this.getClass().getResource(LocalURL.MAIN_FXML_PATH));
+        Scene scene = null;
+        try {
+            scene = new Scene(loader.load());
+        } catch (IOException e) {
+            System.err.println("错误:" + e.getLocalizedMessage());
+            System.exit(1);
+        }
+        primaryStage.setTitle("赋分程序");
+        primaryStage.getIcons().add(new Image(LocalURL.ICON_PATH));
+        primaryStage.setScene(scene);
+        primaryStage.show();
     }
 }

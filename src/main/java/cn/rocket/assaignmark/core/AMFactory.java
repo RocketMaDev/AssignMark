@@ -73,7 +73,7 @@ public class AMFactory {
         } catch (AssigningException ignored) {
         } catch (Exception e) {
             notifier.notify(AMEvent.ERR_UNEXPECTED, e.toString());
-            e.printStackTrace();
+            throw e;
         }
     }
 

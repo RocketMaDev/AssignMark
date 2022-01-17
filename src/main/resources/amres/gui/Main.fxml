@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXProgressBar?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.*?>
+<AnchorPane xmlns:fx="http://javafx.com/fxml/1" fx:id="pane" prefHeight="400.0" prefWidth="600.0"
+            stylesheets="@style.css" xmlns="http://javafx.com/javafx/8.0.171"
+            fx:controller="cn.rocket.assaignmark.gui.Controller">
+    <JFXProgressBar fx:id="progressBar" layoutX="46.0" layoutY="54.0" prefHeight="5.0" progress="0.21"
+                    style="-fx-background-color: dodgerblue;" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+                    AnchorPane.topAnchor="0.0"/>
+    <Label fx:id="progressLabel" alignment="CENTER" layoutX="281.0" layoutY="22.0" text="0/10"
+           AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="5.0"/>
+    <Label fx:id="statusLabel" alignment="CENTER" layoutX="281.0" layoutY="32.0" text="正在初始化"
+           AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="32.0"/>
+    <Label layoutX="113.0" layoutY="99.0" text="Label"/>
+</AnchorPane>

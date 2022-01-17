@@ -18,17 +18,22 @@ public final class LocalURL {
     // Jar associated
     public static final String JAR_PATH; // with /
     public static final String JAR_PARENT_PATH; // with /
+
     // Resources associated
-    public static final String RES_PATH = "/amres/";
-    public static final String TEMPLATE_PATH = RES_PATH + "/core/template.xlsx";
+    private static final String RES_PATH = "/amres/";
+    private static final String CORE_PATH = RES_PATH + "core/";
+    public static final String TEMPLATE_PATH = CORE_PATH + "template.xlsx";
+    private static final String GUI_PATH = RES_PATH + "gui/";
+    public static final String MAIN_FXML_PATH = GUI_PATH + "Main.fxml";
+    public static final String ICON_PATH = GUI_PATH + "icon.png";
 
     static {
         String jarPath;
         try {
             jarPath = Main.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath();
         } catch (URISyntaxException e) {
-            jarPath = null;
             System.err.println("无法解析jar路径！");
+            throw new RuntimeException(e);
         }
         JAR_PATH = jarPath;
         JAR_PARENT_PATH = new File(JAR_PATH).getParent() + "/";
