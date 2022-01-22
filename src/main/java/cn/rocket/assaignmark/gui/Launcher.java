@@ -22,6 +22,7 @@ public class Launcher extends Application {
             scene = new Scene(loader.load());
         } catch (IOException e) {
             System.err.println("错误:" + e.getLocalizedMessage());
+            e.printStackTrace();
             System.exit(1);
         }
         primaryStage.setTitle("赋分程序");

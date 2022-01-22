@@ -30,6 +30,7 @@ public class Main {
 
     /**
      * 程序主入口
+     *
      * @param args 外部传入参数
      */
     public static void main(String[] args) {
@@ -86,13 +87,15 @@ public class Main {
 
             assigningTablePath = cl.getOptionValue('A');
             markTablePath = cl.getOptionValue('I');
-            if (!AMFactory.defaultGetFile(assigningTablePath).exists() || !AMFactory.defaultGetFile(markTablePath).exists())
+            if (!AMFactory.defaultGetFile(assigningTablePath).exists()
+                    || !AMFactory.defaultGetFile(markTablePath).exists())
                 throw new FileNotFoundException("赋分表或分数表不存在");
 
             if (!cl.hasOption('O')) { // 询问是否覆盖
                 Scanner scanner = new Scanner(System.in);
                 System.out.println("尚未输入输出路径!是否覆盖原文件?[y/N]");
                 if (!scanner.nextLine().trim().equals("y")) {
+                    scanner.close();
                     return;
                 }
                 scanner.close();
