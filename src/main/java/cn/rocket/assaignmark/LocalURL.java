@@ -25,7 +25,13 @@ public final class LocalURL {
     public static final String TEMPLATE_PATH = CORE_PATH + "template.xlsx";
     private static final String GUI_PATH = RES_PATH + "gui/";
     public static final String MAIN_FXML_PATH = GUI_PATH + "Main.fxml";
+    public static final String COPYRIGHT_FXML_PATH = GUI_PATH + "Copyright.fxml";
     public static final String ICON_PATH = GUI_PATH + "icon.png";
+
+    // Website associated
+    public static final String REPO_URL = "https://github.com/RocketMaDev/AssignMark";
+    public static final String LICENSE_URL = REPO_URL + "/tree/maven/LICENSE%20OF%20USED%20LIBS";
+    public static final String PERSONAL_URL = "https://github.com/RocketMaDev";
 
     static {
         String jarPath;

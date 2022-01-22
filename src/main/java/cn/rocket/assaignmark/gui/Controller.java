@@ -1,11 +1,19 @@
 package cn.rocket.assaignmark.gui;
 
+import cn.rocket.assaignmark.LocalURL;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXProgressBar;
 import com.jfoenix.controls.JFXTextField;
-import javafx.event.ActionEvent;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
+import javafx.stage.Stage;
+
+import java.io.IOException;
+import java.net.URL;
 
 /**
  * @author Rocket
@@ -21,24 +29,42 @@ public class Controller {
     public JFXTextField outField;
     public JFXButton btn0;
 
+    private Stage copyrightWindow;
+
     public void initialize() {
+        Parent copyright;
+        URL copyrightURL = LocalURL.class.getResource(LocalURL.COPYRIGHT_FXML_PATH);
+        assert copyrightURL != null;
+        try {
+            copyright = FXMLLoader.load(copyrightURL);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        copyrightWindow = new Stage();
+        copyrightWindow.setResizable(false);
+        copyrightWindow.setScene(new Scene(copyright));
+        copyrightWindow.setAlwaysOnTop(true);
+        copyrightWindow.getIcons().add(new Image(LocalURL.ICON_PATH));
+        copyrightWindow.setTitle("关于窗口");
     }
 
-    public void setAtM(ActionEvent atM) {
+    public void setAtM() {
     }
 
-    public void exportM(ActionEvent actionEvent) {
+    public void exportM() {
     }
 
-    public void setMtM(ActionEvent mtM) {
+    public void setMtM() {
     }
 
-    public void setOutM(ActionEvent outM) {
+    public void setOutM() {
     }
 
-    public void startM(ActionEvent actionEvent) {
+    public void startM() {
     }
 
-    public void copyrightM(ActionEvent actionEvent) {
+    public void copyrightM() {
+        if (!copyrightWindow.isShowing())
+            copyrightWindow.show();
     }
 }

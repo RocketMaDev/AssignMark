@@ -5,7 +5,7 @@
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 <AnchorPane xmlns:fx="http://javafx.com/fxml/1" fx:id="pane" prefHeight="402.0" prefWidth="675.0"
-            stylesheets="@style.css" xmlns="http://javafx.com/javafx/8.0.171"
+            stylesheets="@root.css" xmlns="http://javafx.com/javafx/8.0.171"
             fx:controller="cn.rocket.assaignmark.gui.Controller">
    <JFXProgressBar fx:id="progressBar" layoutX="46.0" layoutY="54.0" prefHeight="5.0" visible="false"
                    AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"/>
@@ -26,7 +26,7 @@
               AnchorPane.rightAnchor="26.0">
       <graphic>
          <ImageView pickOnBounds="true" preserveRatio="true">
-            <Image url="@icons8-export-20.png"/>
+            <Image url="@export.png"/>
          </ImageView>
       </graphic>
    </JFXButton>
@@ -51,5 +51,6 @@
    <JFXButton buttonType="RAISED" layoutX="516.0" layoutY="330.0" onAction="#startM" text="开始赋分"
               AnchorPane.bottomAnchor="42.0" AnchorPane.rightAnchor="30.0"/>
    <JFXButton fx:id="btn0" layoutX="14.0" layoutY="403.0" onAction="#copyrightM"
-              text="© Copyright 2021 Rocket, 遵循MIT开源协议" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"/>
+              text="© Copyright 2021 Rocket, 遵循Apache 2.0开源协议" AnchorPane.bottomAnchor="0.0"
+              AnchorPane.leftAnchor="0.0"/>
 </AnchorPane>
