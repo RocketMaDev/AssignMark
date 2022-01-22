@@ -19,7 +19,14 @@
         </developer>
     </developers>
 
-    <contributors/>
+    <contributors>
+        <contributor>
+            <name>xy</name>
+            <roles>
+                <role>drawing a part of icon</role>
+            </roles>
+        </contributor>
+    </contributors>
 
     <licenses>
         <license>
@@ -32,7 +39,7 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>3.8.1</version>
+            <version>4.13.2</version>
             <scope>test</scope>
         </dependency>
         <dependency>
