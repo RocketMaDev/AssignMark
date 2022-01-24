@@ -51,6 +51,6 @@
    <JFXButton buttonType="RAISED" layoutX="516.0" layoutY="330.0" onAction="#startM" text="开始赋分"
               AnchorPane.bottomAnchor="42.0" AnchorPane.rightAnchor="30.0"/>
    <JFXButton fx:id="btn0" layoutX="14.0" layoutY="403.0" onAction="#copyrightM"
-              text="© Copyright 2021 Rocket, 遵循Apache 2.0开源协议" AnchorPane.bottomAnchor="0.0"
+              text="© Copyright 2021-2022 Rocket, 遵循Apache 2.0开源协议" AnchorPane.bottomAnchor="0.0"
               AnchorPane.leftAnchor="0.0"/>
 </AnchorPane>

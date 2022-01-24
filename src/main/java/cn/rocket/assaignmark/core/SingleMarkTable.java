@@ -73,28 +73,22 @@ public class SingleMarkTable {
      */
     private void searchStages() {
         stages = new int[STAGES];
+        for (int i = 0; i < STAGES; i++)
+            stages[i] = -1;
         int pos = 0, buffer = 0, cachedBuffer, j;
         for (int i = 0; i < stages.length; i++) {
             if (i == stages.length - 1) {
                 stages[i] = pos;
                 break;
             }
-            if (reqrStageNums[i] == 0) {
-                stages[i] = -1;
+            if (reqrStageNums[i] == 0)
                 continue;
-            }
             stages[i] = pos;
-            if (reqrStageNums[i] == -1) {
-                for (j = i + 1; j < stages.length; j++)
-                    stages[j] = -1; // 把后面所有分段置为无人
+            if (reqrStageNums[i] == -1)
                 break;
-            }
             pos += reqrStageNums[i] + buffer - 1;
-            if (originalMarks.length - 1 <= pos) {
-                for (j = i + 1; j < stages.length; j++)
-                    stages[j] = -1; // 同上一条
+            if (originalMarks.length - 1 <= pos)
                 break;
-            }
             if (originalMarks[pos] == originalMarks[pos + 1]) {
                 j = pos;
                 while (j > 0 && originalMarks[j - 1] == originalMarks[j])

@@ -30,6 +30,7 @@ public class AssigningTable {
     public static final int SUBJECTS = 7;
     public static final int STAGES = 20;
 
+    public static final String[] SUBJECT_NAMES = {"政治", "历史", "地理", "物理", "化学", "生物", "技术"};
     public static final int POLITICS = 0;
     public static final int HISTORY = 1;
     public static final int GEOGRAPHY = 2;

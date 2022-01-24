@@ -262,9 +262,10 @@ public class MarkTable {
                 try {
                     markWorkbook.close();
                 } catch (IOException ioException) {
-                    ioException.printStackTrace();
+                    ioException.printStackTrace(); // TODO close 失败，唤醒err_IO事件（常规事件）
                 }
-                notifier.notify(AMEvent.ERR_MT_INCORRECT_FORMAT);
+                notifier.notify(AMEvent.ERR_MT_INCORRECT_FORMAT,
+                        "第一个出现问题的是学科 " + SUBJECT_NAMES[i] + " 请一并检查剩余学科");
                 throw new AssigningException(e);
             }
         }

@@ -6,6 +6,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
+import org.apache.logging.log4j.LogManager;
 
 import java.io.IOException;
 
@@ -21,7 +22,7 @@ public class Launcher extends Application {
         try {
             scene = new Scene(loader.load());
         } catch (IOException e) {
-            System.err.println("错误:" + e.getLocalizedMessage());
+            LogManager.getRootLogger().error("错误:" + e.getLocalizedMessage());
             e.printStackTrace();
             System.exit(1);
         }

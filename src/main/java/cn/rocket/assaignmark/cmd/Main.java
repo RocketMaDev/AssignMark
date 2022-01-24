@@ -2,13 +2,15 @@ package cn.rocket.assaignmark.cmd;
 
 import cn.rocket.assaignmark.LocalURL;
 import cn.rocket.assaignmark.core.AMFactory;
+import cn.rocket.assaignmark.core.event.AMEvent;
 import cn.rocket.assaignmark.core.event.AMEventHandler;
 import cn.rocket.assaignmark.gui.Launcher;
 import javafx.application.Application;
 import org.apache.commons.cli.*;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Scanner;
 
@@ -27,6 +29,7 @@ public class Main {
             "错误： 未找到分数表", "错误： 无法读取分数表", "错误： 分数表不是标准xlsx表格", "错误： 分数表格式不符合规范！请查阅说明",
             "错误： 写出失败！非法的导出路径，或无权限写入。请确保导出表格没有在Excel等应用中打开",
             "错误： 分数表必须包含可赋分的工作表", "错误： 未在意料中的错误"};
+    private static final Logger LOGGER = LogManager.getLogger();
 
     /**
      * 程序主入口
@@ -56,7 +59,7 @@ public class Main {
             CommandLine cl = parser.parse(options, args);
             if (cl.hasOption("h")) {
                 formatter.printHelp("AssignMark.jar", options);
-                System.out.println("\n A,I选项在赋分时必须使用，O选项可选，表示覆盖原文件\n" +
+                LOGGER.info("\n A,I选项在赋分时必须使用，O选项可选，表示覆盖原文件\n" +
                         " 不进行赋分，可选h,e参数\n" +
                         " 无参数则启动gui界面");
                 return;
@@ -71,9 +74,9 @@ public class Main {
                         }
                     if (file.exists())
                         throw new Exception("过多赋分表已存在在当前路径！");
-                    System.out.println("正在复制赋分表...");
+                    LOGGER.info("正在复制赋分表...");
                     AMFactory.extractTable(file.getPath());
-                    System.out.println("完成！");
+                    LOGGER.info("完成！");
                     return;
                 } catch (IOException ioException) {
                     handleException(ioException, "复制失败!");
@@ -87,13 +90,9 @@ public class Main {
 
             assigningTablePath = cl.getOptionValue('A');
             markTablePath = cl.getOptionValue('I');
-            if (!AMFactory.defaultGetFile(assigningTablePath).exists()
-                    || !AMFactory.defaultGetFile(markTablePath).exists())
-                throw new FileNotFoundException("赋分表或分数表不存在");
-
             if (!cl.hasOption('O')) { // 询问是否覆盖
                 Scanner scanner = new Scanner(System.in);
-                System.out.println("尚未输入输出路径!是否覆盖原文件?[y/N]");
+                LOGGER.warn("尚未输入输出路径!是否覆盖原文件?[y/N]");
                 if (!scanner.nextLine().trim().equals("y")) {
                     scanner.close();
                     return;
@@ -104,13 +103,14 @@ public class Main {
             outputPath = cl.hasOption('O') ? cl.getOptionValue('O') : markTablePath;
         } catch (ParseException e) {
             handleException(e, "参数有误！请使用-h参数查看详细使用指南");
-        } catch (FileNotFoundException e) {
-            handleException(e, null);
         }
         AMEventHandler handler = (e, msg) -> {
-            System.out.println(msgList[e.ordinal()]);
-            if (msg != null)
-                System.out.println("错误提示：" + msg);
+            if (e.getIndex() >= AMEvent.ERR_AT_NOT_FOUND.getIndex()) {
+                LOGGER.fatal(msgList[e.ordinal()]);
+                if (msg != null)
+                    LOGGER.error(msg);
+            } else
+                LOGGER.info(msgList[e.ordinal()]);
         };
         assert assigningTablePath != null && markTablePath != null && outputPath != null;
         new AMFactory(assigningTablePath, markTablePath, handler, outputPath).work();
@@ -123,10 +123,9 @@ public class Main {
      * @param hint 提示信息
      */
     private static void handleException(Exception e, String hint) {
-        System.out.print("错误：");
-        System.err.println(e.toString());
+        LOGGER.fatal("错误：" + e.toString());
         if (hint != null)
-            System.err.println(hint);
+            LOGGER.error(hint);
         System.exit(0);
     }
 }
