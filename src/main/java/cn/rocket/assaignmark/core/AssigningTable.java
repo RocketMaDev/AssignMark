@@ -6,6 +6,7 @@ import cn.rocket.assaignmark.core.event.Notifier;
 import cn.rocket.assaignmark.core.exception.AssigningException;
 import cn.rocket.assaignmark.core.exception.IncorrectSheetException;
 import cn.rocket.assaignmark.core.exception.InvalidTableException;
+import org.apache.poi.EmptyFileException;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.ss.usermodel.Cell;
@@ -78,7 +79,7 @@ public class AssigningTable {
             }
             OPCPackage pkg = OPCPackage.open(new FileInputStream(AMFactory.defaultGetFile(wbPath)));
             wb = new XSSFWorkbook(pkg);
-        } catch (InvalidFormatException e) {
+        } catch (EmptyFileException | InvalidFormatException e) {
             notifier.notify(AMEvent.ERR_AT_INCORRECT_FORMAT);
             throw new AssigningException(e);
         } catch (FileNotFoundException e) {

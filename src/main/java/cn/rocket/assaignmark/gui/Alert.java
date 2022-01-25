@@ -10,7 +10,6 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.paint.Paint;
-import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
@@ -19,6 +18,7 @@ import javafx.stage.StageStyle;
  * @version 0.9.8
  */
 public class Alert {
+    // TODO 图标设计
     private final Stage alertStage = new Stage(StageStyle.UNDECORATED);
     private static final double GAP = 25;
     private static final double FONT_SIZE = 22;
@@ -31,6 +31,7 @@ public class Alert {
     public Alert(String message, Controller controller) {
         assert controller != null;
         this.controller = controller;
+        controller.lockWindow();
 
         ok = new JFXButton("确定");
         ok.setTextFill(Paint.valueOf("DODGERBLUE"));
@@ -42,7 +43,6 @@ public class Alert {
         AnchorPane.setBottomAnchor(cancel, GAP);
 
         text = new Label(message);
-        text.setFont(Font.font(FONT_SIZE));
         text.setWrapText(true);
         AnchorPane.setTopAnchor(text, GAP);
         AnchorPane.setLeftAnchor(text, GAP);
@@ -58,12 +58,12 @@ public class Alert {
         Scene scene = new Scene(anchorPane);
         alertStage.setScene(scene);
         alertStage.setAlwaysOnTop(true);
-//        alertStage.setOnCloseRequest(event -> GlobalVariables.mwObj.unlockMainWindow());
+        alertStage.setOnCloseRequest(event -> close());
     }
 
     public void setEventHandler(EventHandler<ActionEvent> okHandler, EventHandler<ActionEvent> cancelHandler) {
-        ok.setOnAction(okHandler);
-        cancel.setOnAction(cancelHandler);
+        ok.setOnAction(okHandler != null ? okHandler : event -> close());
+        cancel.setOnAction(cancelHandler != null ? cancelHandler : event -> close());
     }
 
     public void show() {
@@ -75,5 +75,6 @@ public class Alert {
 
     public void close() {
         alertStage.close();
+        controller.unlockWindow();
     }
 }

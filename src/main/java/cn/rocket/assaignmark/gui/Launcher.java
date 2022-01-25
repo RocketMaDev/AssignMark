@@ -15,6 +15,8 @@ import java.io.IOException;
  * @version 0.9.8
  */
 public class Launcher extends Application {
+    static Stage mainStage;
+
     @Override
     public void start(Stage primaryStage) {
         FXMLLoader loader = new FXMLLoader(this.getClass().getResource(LocalURL.MAIN_FXML_PATH));
@@ -30,5 +32,6 @@ public class Launcher extends Application {
         primaryStage.getIcons().add(new Image(LocalURL.ICON_PATH));
         primaryStage.setScene(scene);
         primaryStage.show();
+        mainStage = primaryStage;
     }
 }

@@ -62,6 +62,21 @@ public class AMFactory {
         }
     }
 
+    public static void tryToExtract(String parentPath) throws IOException, AssigningException {
+        if (parentPath.charAt(parentPath.length() - 1) != File.separatorChar)
+            parentPath += "/";
+        File file = new File(parentPath + "赋分表.xlsx");
+        if (file.exists())
+            for (int i = 0; i < 10; i++) {
+                file = new File(LocalURL.JAR_PARENT_PATH + "赋分表" + i + ".xlsx");
+                if (!file.exists())
+                    break;
+            }
+        if (file.exists())
+            throw new AssigningException("过多赋分表已存在在当前路径！");
+        extractTable(file.getPath());
+    }
+
     /**
      * 安全的。
      * <p>
@@ -95,9 +110,16 @@ public class AMFactory {
 
     public static File getFile(String parent, String child) {
         File file = new File(child);
+        File outFile;
         if (file.isAbsolute())
-            return file;
-        return new File(parent, child);
+            outFile = file;
+        else
+            outFile = new File(parent, child);
+        try {
+            return outFile.getCanonicalFile();
+        } catch (IOException e) {
+            return outFile;
+        }
     }
 
     public static File defaultGetFile(String path) {

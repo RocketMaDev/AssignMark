@@ -6,6 +6,7 @@ import cn.rocket.assaignmark.core.event.Notifier;
 import cn.rocket.assaignmark.core.exception.AssigningException;
 import cn.rocket.assaignmark.core.exception.EmptyMarkTableException;
 import cn.rocket.assaignmark.core.exception.IncorrectSheetException;
+import org.apache.poi.EmptyFileException;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.ss.usermodel.*;
@@ -60,10 +61,15 @@ public class MarkTable {
      * @see AMEventHandler
      */
     protected MarkTable(String wbPath, AMEventHandler handler, String outputPath, AssigningTable assigningTable, Notifier _notifier) throws AssigningException {
-        if (_notifier != null)
+        if (_notifier != null) {
             notifier = _notifier;
-        else
+        } else {
             notifier = new Notifier(handler);
+        }
+        if (AMFactory.defaultGetFile(wbPath).equals(AMFactory.defaultGetFile(outputPath))) {
+            notifier.notify(AMEvent.ERR_MT_EQUALS_OUT);
+            throw new AssigningException();
+        }
         if (assigningTable == null || assigningTable.isNotLoaded())
             throw new NullPointerException("assigningTable can not null or empty!");
         this.assigningTable = assigningTable;
@@ -73,7 +79,7 @@ public class MarkTable {
             File wbFile = AMFactory.defaultGetFile(wbPath);
             OPCPackage pkg;
             // 处理大型xlsx表格
-            if (wbFile.length() < 10 * 1024 * 1024) // 10MiB
+            if (wbFile.length() >= 5 * 1024 * 1024) // 5MiB
                 pkg = OPCPackage.open(wbFile);
             else
                 pkg = OPCPackage.open(new FileInputStream(wbFile));
@@ -81,7 +87,7 @@ public class MarkTable {
         } catch (FileNotFoundException e) {
             notifier.notify(AMEvent.ERR_MT_NOT_FOUND);
             throw new AssigningException(e);
-        } catch (InvalidFormatException e) {
+        } catch (EmptyFileException | InvalidFormatException e) {
             notifier.notify(AMEvent.ERR_MT_INVALID_FORMAT);
             throw new AssigningException(e);
         } catch (IOException e) {
@@ -262,7 +268,7 @@ public class MarkTable {
                 try {
                     markWorkbook.close();
                 } catch (IOException ioException) {
-                    ioException.printStackTrace(); // TODO close 失败，唤醒err_IO事件（常规事件）
+                    ioException.printStackTrace(); // Unexpected
                 }
                 notifier.notify(AMEvent.ERR_MT_INCORRECT_FORMAT,
                         "第一个出现问题的是学科 " + SUBJECT_NAMES[i] + " 请一并检查剩余学科");

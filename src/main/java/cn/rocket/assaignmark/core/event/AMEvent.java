@@ -32,7 +32,8 @@ public enum AMEvent {
     ERR_MT_INCORRECT_FORMAT(40),
     ERR_FAILED_TO_WRITE(41),
     ERR_MT_EMPTY(42),
-    ERR_UNEXPECTED(43);
+    ERR_MT_EQUALS_OUT(43),
+    ERR_UNEXPECTED(44);
 
     /**
      * 每个事件的索引

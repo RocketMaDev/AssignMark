@@ -4,15 +4,14 @@ import cn.rocket.assaignmark.LocalURL;
 import cn.rocket.assaignmark.core.AMFactory;
 import cn.rocket.assaignmark.core.event.AMEvent;
 import cn.rocket.assaignmark.core.event.AMEventHandler;
+import cn.rocket.assaignmark.core.exception.AssigningException;
 import cn.rocket.assaignmark.gui.Launcher;
 import javafx.application.Application;
 import org.apache.commons.cli.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.Scanner;
 
 /**
  * 主类
@@ -28,7 +27,7 @@ public class Main {
             "错误： 未经验证的赋分表！请使用-e参数导出的赋分表",
             "错误： 未找到分数表", "错误： 无法读取分数表", "错误： 分数表不是标准xlsx表格", "错误： 分数表格式不符合规范！请查阅说明",
             "错误： 写出失败！非法的导出路径，或无权限写入。请确保导出表格没有在Excel等应用中打开",
-            "错误： 分数表必须包含可赋分的工作表", "错误： 未在意料中的错误"};
+            "错误： 分数表必须包含可赋分的工作表", "错误： 分数表路径与输出路径不能一致", "错误： 未在意料中的错误"};
     private static final Logger LOGGER = LogManager.getLogger();
 
     /**
@@ -59,48 +58,29 @@ public class Main {
             CommandLine cl = parser.parse(options, args);
             if (cl.hasOption("h")) {
                 formatter.printHelp("AssignMark.jar", options);
-                LOGGER.info("\n A,I选项在赋分时必须使用，O选项可选，表示覆盖原文件\n" +
+                LOGGER.info("\n A,I,O选项在赋分时必须使用，输出应与前两文件不同\n" +
                         " 不进行赋分，可选h,e参数\n" +
                         " 无参数则启动gui界面");
                 return;
             } else if (cl.hasOption("e")) {
                 try {
-                    File file = new File(LocalURL.JAR_PARENT_PATH + "赋分表.xlsx");
-                    if (file.exists())
-                        for (int i = 0; i < 10; i++) {
-                            file = new File(LocalURL.JAR_PARENT_PATH + "赋分表" + i + ".xlsx");
-                            if (!file.exists())
-                                break;
-                        }
-                    if (file.exists())
-                        throw new Exception("过多赋分表已存在在当前路径！");
-                    LOGGER.info("正在复制赋分表...");
-                    AMFactory.extractTable(file.getPath());
+                    LOGGER.info("开始导出...");
+                    AMFactory.tryToExtract(LocalURL.JAR_PARENT_PATH);
                     LOGGER.info("完成！");
                     return;
                 } catch (IOException ioException) {
                     handleException(ioException, "复制失败!");
-                } catch (Exception exception) {
+                } catch (AssigningException exception) {
                     handleException(exception, null);
                 }
                 return;
-            } else if (!cl.hasOption('A') || !cl.hasOption('I')) {
-                throw new ParseException("要赋分，必须包含A、I参数！");
+            } else if (!cl.hasOption('A') || !cl.hasOption('I') || !cl.hasOption('O')) {
+                throw new ParseException("要赋分，必须包含A、I、O参数！");
             }
 
             assigningTablePath = cl.getOptionValue('A');
             markTablePath = cl.getOptionValue('I');
-            if (!cl.hasOption('O')) { // 询问是否覆盖
-                Scanner scanner = new Scanner(System.in);
-                LOGGER.warn("尚未输入输出路径!是否覆盖原文件?[y/N]");
-                if (!scanner.nextLine().trim().equals("y")) {
-                    scanner.close();
-                    return;
-                }
-                scanner.close();
-            }
-
-            outputPath = cl.hasOption('O') ? cl.getOptionValue('O') : markTablePath;
+            outputPath = cl.getOptionValue('O');
         } catch (ParseException e) {
             handleException(e, "参数有误！请使用-h参数查看详细使用指南");
         }
