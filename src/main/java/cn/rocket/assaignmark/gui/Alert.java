@@ -21,7 +21,6 @@ import javafx.stage.StageStyle;
  * @version 0.9.8
  */
 public class Alert {
-    // TODO 图标设计
     private final Stage alertStage = new Stage(StageStyle.UNDECORATED);
     private static final double GAP = 25;
     private static final double SMALL_GAP = 10;
