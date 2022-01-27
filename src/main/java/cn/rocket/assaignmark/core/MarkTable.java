@@ -8,6 +8,7 @@ import cn.rocket.assaignmark.core.exception.EmptyMarkTableException;
 import cn.rocket.assaignmark.core.exception.IncorrectSheetException;
 import org.apache.poi.EmptyFileException;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.openxml4j.exceptions.OLE2NotOfficeXmlFileException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -87,7 +88,7 @@ public class MarkTable {
         } catch (FileNotFoundException e) {
             notifier.notify(AMEvent.ERR_MT_NOT_FOUND);
             throw new AssigningException(e);
-        } catch (EmptyFileException | InvalidFormatException e) {
+        } catch (OLE2NotOfficeXmlFileException | EmptyFileException | InvalidFormatException e) {
             notifier.notify(AMEvent.ERR_MT_INVALID_FORMAT);
             throw new AssigningException(e);
         } catch (IOException e) {

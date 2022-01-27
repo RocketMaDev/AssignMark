@@ -17,6 +17,10 @@ import java.io.IOException;
 public class Launcher extends Application {
     static Stage mainStage;
 
+    public static void launchSelf() {
+        Application.launch(Launcher.class);
+    }
+
     @Override
     public void start(Stage primaryStage) {
         FXMLLoader loader = new FXMLLoader(this.getClass().getResource(LocalURL.MAIN_FXML_PATH));
@@ -31,6 +35,7 @@ public class Launcher extends Application {
         primaryStage.setTitle("赋分程序");
         primaryStage.getIcons().add(new Image(LocalURL.ICON_PATH));
         primaryStage.setScene(scene);
+        primaryStage.setResizable(false);
         primaryStage.show();
         mainStage = primaryStage;
     }

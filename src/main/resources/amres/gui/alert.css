@@ -1,0 +1,12 @@
+@font-face {
+    src: url('SYSans.otf');
+}
+
+.root {
+    -fx-font-family: "Source Han Sans CN Normal";
+    -fx-font-size: 22;
+}
+
+.jfx-button {
+    -fx-text-fill: DODGERBLUE;
+}
