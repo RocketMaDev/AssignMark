@@ -176,7 +176,7 @@ public class AssigningTable {
                         allReqrStageNums[i][r] = 0;
                     else {
                         t = Double.parseDouble(formatter.formatCellValue(c));
-                        if (t > -1 && t < 0) // 处理负数
+                        if (t > -1 && t < 0 || t < -1) // 处理负数
                             throw new IncorrectSheetException();
                         allReqrStageNums[i][r] = t;
                     }
