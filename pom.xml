@@ -11,6 +11,22 @@
     <version>0.9.8-SNAPSHOT</version>
     <inceptionYear>2021</inceptionYear>
 
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <!--Undone here!!!!TODO-->
+    <scm>
+        <tag>maven</tag>
+        <url>git@gitee.com:centy/xxl-job-spring-boot-starter.git</url>
+        <connection>scm:git:git@gitee.com:centy/xxl-job-spring-boot-starter.git</connection>
+        <developerConnection>scm:git:git@gitee.com:centy/xxl-job-spring-boot-starter.git</developerConnection>
+    </scm>
+
     <developers>
         <developer>
             <id>Rocket</id>
@@ -27,13 +43,6 @@
             </roles>
         </contributor>
     </contributors>
-
-    <licenses>
-        <license>
-            <name>Apache 2.0</name>
-            <url>https://github.com/RocketMaDev/AssignMark/blob/cmd/LICENSE</url>
-        </license>
-    </licenses>
 
     <dependencies>
         <dependency>
