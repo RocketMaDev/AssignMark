@@ -4,7 +4,8 @@ package cn.rocket.assaignmark.core.event;
  * 赋分事件枚举
  *
  * @author Rocket
- * @version 0.9.8
+ * @version 1.0.8
+ * @since 0.9.8
  */
 public enum AMEvent {
     LOAD_AT(0),

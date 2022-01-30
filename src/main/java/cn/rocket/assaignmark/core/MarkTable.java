@@ -22,7 +22,8 @@ import static cn.rocket.assaignmark.core.AssigningTable.*;
  * 用来进行赋分
  *
  * @author Rocket
- * @version 0.9.8
+ * @version 1.0.8
+ * @since 0.9.8
  */
 public class MarkTable {
     public static final int ROW_LIMIT = 10;

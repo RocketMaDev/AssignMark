@@ -13,7 +13,8 @@ import java.util.Scanner;
 
 /**
  * @author Rocket
- * @version 0.9-pre
+ * @version 1.0.8
+ * @since 0.9.8
  */
 public class Processor extends Main {
     public static final String[] msgList = {"正在加载赋分表...", "正在检查赋分表...", "正在加载分数表...", "正在检查分数表...",

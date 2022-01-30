@@ -8,7 +8,8 @@ import org.apache.logging.log4j.Logger;
  * 主类
  *
  * @author Rocket
- * @version 0.9.8
+ * @version 1.0.8
+ * @since 0.9.8
  */
 public class Main {
 

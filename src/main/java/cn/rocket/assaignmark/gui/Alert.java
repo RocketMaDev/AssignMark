@@ -18,7 +18,8 @@ import javafx.stage.StageStyle;
 
 /**
  * @author Rocket
- * @version 0.9.8
+ * @version 1.0.8
+ * @since 1.0.8
  */
 public class Alert {
     private final Stage alertStage = new Stage(StageStyle.UNDECORATED);

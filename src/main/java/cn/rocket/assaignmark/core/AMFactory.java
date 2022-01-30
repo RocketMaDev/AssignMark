@@ -21,7 +21,8 @@ import java.nio.file.StandardCopyOption;
  * 用以提供便捷的生成打包的赋分对象的服务
  *
  * @author Rocket
- * @version 0.9.8
+ * @version 1.0.8
+ * @since 0.9.8
  */
 public class AMFactory {
     private final String assigningTablePath;

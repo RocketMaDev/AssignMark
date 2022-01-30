@@ -4,8 +4,9 @@ package cn.rocket.assaignmark.core.exception;
  * 赋分异常，在出现已定义的异常时抛出。会自动关闭<code>Notifier</code>的线程池
  *
  * @author Rocket
- * @version 0.9.8
+ * @version 1.0.8
  * @see cn.rocket.assaignmark.core.event.Notifier
+ * @since 0.9.8
  */
 public class AssigningException extends Exception {
     public AssigningException() {

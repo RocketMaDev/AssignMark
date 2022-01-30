@@ -24,7 +24,8 @@ import java.net.URL;
 
 /**
  * @author Rocket
- * @version 0.9.8
+ * @version 1.0.8
+ * @since 1.0.8
  */
 public class Controller {
     private final FileChooser chooser;
@@ -133,7 +134,9 @@ public class Controller {
         if (!outFile.exists())
             // noinspection ResultOfMethodCallIgnored
             outFile.getParentFile().mkdirs();
-        System.out.println("test!");
+        Alert alert = new Alert("尚未完成...请等待1.1.8版本", this, null, false);
+        alert.setEventHandler(null, null);
+        alert.show();
     }
 
     public void copyrightM() {

@@ -6,7 +6,8 @@ package cn.rocket.assaignmark.core;
  * 包含当前分段最高分和最低分
  *
  * @author Rocket
- * @version 0.9.8
+ * @version 1.0.8
+ * @since 0.9.8
  */
 public final class MarkTarget {
     private final double au;

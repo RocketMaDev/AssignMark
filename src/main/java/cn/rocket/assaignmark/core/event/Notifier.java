@@ -9,7 +9,8 @@ import java.util.concurrent.Executors;
  * 使用线程池以串行完成任务
  *
  * @author Rocket
- * @version 0.9.8
+ * @version 1.0.8
+ * @since 0.9.8
  */
 public class Notifier {
     private final AMEventHandler handler;

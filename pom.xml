@@ -6,9 +6,9 @@
 
     <packaging>jar</packaging>
     <name>assigning-mark</name>
-    <groupId>cn.rocket</groupId>
+    <groupId>io.github.rocketmadev</groupId>
     <artifactId>AssignMark</artifactId>
-    <version>0.9.8-SNAPSHOT</version>
+    <version>1.0.8</version>
     <inceptionYear>2021</inceptionYear>
 
     <licenses>
@@ -19,12 +19,11 @@
         </license>
     </licenses>
 
-    <!--Undone here!!!!TODO-->
     <scm>
         <tag>maven</tag>
-        <url>git@gitee.com:centy/xxl-job-spring-boot-starter.git</url>
-        <connection>scm:git:git@gitee.com:centy/xxl-job-spring-boot-starter.git</connection>
-        <developerConnection>scm:git:git@gitee.com:centy/xxl-job-spring-boot-starter.git</developerConnection>
+        <url>git@github.com:RocketMaDev/AssignMark.git</url>
+        <connection>scm:git:git@github.com:RocketMaDev/AssignMark.git</connection>
+        <developerConnection>scm:git:git@github.com:RocketMaDev/AssignMark.git</developerConnection>
     </scm>
 
     <developers>
@@ -93,6 +92,93 @@
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
     </properties>
+
+    <profiles>
+        <profile>
+            <id>release</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-jar-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>jar</goal>
+                                    <goal>test-jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>attach-sources</id>
+                                <goals>
+                                    <goal>jar-no-fork</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>attach-javadocs</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                                <configuration>
+                                    <additionalOption>
+                                        <additionalOption>-Xdoclint:none</additionalOption>
+                                    </additionalOption>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.sonatype.plugins</groupId>
+                        <artifactId>nexus-staging-maven-plugin</artifactId>
+                        <version>1.6.3</version>
+                        <extensions>true</extensions>
+                        <configuration>
+                            <serverId>ossrh</serverId>
+                            <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                            <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+            <distributionManagement>
+                <snapshotRepository>
+                    <id>sonatype-nexus-snapshots</id>
+                    <name>Sonatype Nexus Snapshots</name>
+                    <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+                </snapshotRepository>
+                <repository>
+                    <id>sonatype-nexus-staging</id>
+                    <name>Nexus Release Repository</name>
+                    <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+                </repository>
+            </distributionManagement>
+        </profile>
+    </profiles>
 
     <build>
         <resources>

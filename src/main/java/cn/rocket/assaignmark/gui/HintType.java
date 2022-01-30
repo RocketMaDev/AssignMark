@@ -4,7 +4,8 @@ import cn.rocket.assaignmark.LocalURL;
 
 /**
  * @author Rocket
- * @version 0.9-pre
+ * @version 1.0.8
+ * @since 1.0.8
  */
 public enum HintType {
     HINT(LocalURL.ICON_HINT_PATH),

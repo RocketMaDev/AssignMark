@@ -26,7 +26,8 @@ import java.io.IOException;
  * 用来存储赋分比例信息
  *
  * @author Rocket
- * @version 0.9.8
+ * @version 1.0.8
+ * @since 0.9.8
  */
 public class AssigningTable {
     public static final int SUBJECTS = 7;

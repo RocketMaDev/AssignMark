@@ -12,7 +12,8 @@ import java.io.IOException;
 
 /**
  * @author Rocket
- * @version 0.9.8
+ * @version 1.0.8
+ * @since 1.0.8
  */
 public class Launcher extends Application {
     static Stage mainStage;

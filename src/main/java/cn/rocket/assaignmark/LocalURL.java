@@ -9,7 +9,8 @@ import java.net.URISyntaxException;
  * 程序中存放资源地址的工具类
  *
  * @author Rocket
- * @version 0.9.8
+ * @version 1.0.8
+ * @since 0.9.8
  */
 public final class LocalURL {
     private LocalURL() {

@@ -8,7 +8,8 @@ import static cn.rocket.assaignmark.core.AssigningTable.STAGES;
  * 赋分程序的核心部分
  *
  * @author Rocket
- * @version 0.9.8
+ * @version 1.0.8
+ * @since 0.9.8
  */
 public class SingleMarkTable {
     public static final MarkTarget[] targets;
