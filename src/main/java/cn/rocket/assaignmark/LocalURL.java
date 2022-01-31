@@ -37,7 +37,7 @@ public final class LocalURL {
 
     // Website associated
     public static final String REPO_URL = "https://github.com/RocketMaDev/AssignMark";
-    public static final String LICENSE_URL = REPO_URL + "/tree/maven/LICENSE%20OF%20USED%20LIBS";
+    public static final String LICENSE_URL = REPO_URL + "/blob/maven/LICENSE%20OF%20USED%20LIBS";
     public static final String PERSONAL_URL = "https://github.com/RocketMaDev";
 
     static {
