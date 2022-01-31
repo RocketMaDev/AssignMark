@@ -30,6 +30,19 @@ AssignMark是一个针对于浙江省新赋分模式的赋分程序，本程序�
 > java -jar AssignMark.jar -A 赋分表.xlsx -I 分数表.xlsx -O 导出.xlsx
 ```
 
+## 引用本库
+
+在您的`pom.xml`(Maven)的`<dependencies>`中添加如下内容:
+
+```xml
+
+<dependency>
+   <groupId>io.github.rocketmadev</groupId>
+   <artifactId>AssignMark</artifactId>
+   <version>1.0.8</version>
+</dependency>
+```
+
 ## 未来计划
 
 - [ ] 完成图形化界面`(1.1.8)`

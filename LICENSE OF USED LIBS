@@ -1,0 +1,92 @@
+The following projects or libraries are used in the program.
+
+--------------------------------------------------------------------------
+
+- Cascadia Code - From Microsoft - SIL OPEN FONT LICENSE 1.1 -
+
+Cascadia is a fun new coding font that comes bundled with Windows Terminal,
+and is now the default font in Visual Studio as well.
+
+> https://github.com/microsoft/cascadia-code/blob/main/LICENSE
+
+--------------------------------------------------------------------------
+
+- Source Han Sans - From Adobe - SIL OPEN FONT LICENSE 1.1 -
+
+Source Han Sans is a set of OpenType Pan-CJK fonts. In addition to
+functional OpenType fonts,this open source project provides all of the
+source files that were used to build these OpenType fonts by using the
+AFDKO tools.
+
+> https://github.com/adobe-fonts/source-han-sans/blob/master/LICENSE.txt
+
+--------------------------------------------------------------------------
+
+- log4j2 - From apache - Apache License 2.0 -
+
+Apache Log4j 2 is an upgrade to Log4j that provides significant improvements
+over its predecessor, Log4j 1.x, and provides many of the improvements
+available in Logback while fixing some inherent problems in Logback's
+architecture.
+
+> https://github.com/apache/logging-log4j2/blob/release-2.x/LICENSE.txt
+
+* CONTAINS THE LICENSES OF log4j-core AND log4j-api
+
+--------------------------------------------------------------------------
+
+- jfoenix - From Shadi Shaheen - MIT License -
+
+JFoenix is an open source java library, that implements Google Material
+Design using java components.
+
+> https://github.com/sshahine/JFoenix/blob/master/LICENSE
+
+--------------------------------------------------------------------------
+
+- junit - From junit-team - Eclipse Public License - v 2.0 -
+
+JUnit 5 is the next generation of JUnit. The goal is to create an up-to-date
+foundation for developer-side testing on the JVM. This includes focusing
+on Java 8 and above, as well as enabling many different styles of testing.
+
+> https://github.com/junit-team/junit5/blob/main/LICENSE.md
+
+--------------------------------------------------------------------------
+
+- poi & poi-ooxml - From apache - Apache License 2.0 -
+
+The Apache POI Project's mission is to create and maintain Java APIs for
+manipulating various file formats based upon the Office Open XML standards
+(OOXML) and Microsoft's OLE 2 Compound Document format (OLE2). In short,
+you can read and write MS Excel files using Java. In addition, you can
+read and write MS Word and MS PowerPoint files using Java. Apache POI is
+your Java Excel solution (for Excel 97-2008). We have a complete API for
+porting other OOXML and OLE2 formats and welcome others to participate.
+
+> https://poi.apache.org/legal.html
+
+--------------------------------------------------------------------------
+
+- commons-cli - From apache - Apache License 2.0 -
+
+The Apache Commons CLI library provides an API for parsing command line
+options passed to programs. It's also able to print help messages detailing
+the options available for a command line tool.
+
+> https://www.apache.org/licenses/
+
+--------------------------------------------------------------------------
+
+- icons - From icons8.com - Universal Multimedia Licensing Agreement for Icons8 -
+
+Professional icons by the rockstar team to beautify your work.
+Multiple formats, customization, and diverse styles.
+
+> https://intercom.help/icons8-7fb7577e8170/en/articles/5534926-universal-multimedia-licensing-agreement-for-icons8
+<- https://icons8.com/license
+
+* When creating the icon of this program, icons on icons8.com were used.
+* On the website: https://icons8.com/icons/set/pencil
+
+--------------------------------------------------------------------------
