@@ -82,11 +82,15 @@ public class AMFactory {
      * 安全的。
      * <p>
      * 开始赋分，全流程包括：检查并读取赋分表比例、人数，检查并读取分数表分数，分科目分别赋分，最后输出
+     * <p>
+     * 在线程中断(interrupt)时，会扔出<code>RuntimeException</code>包装的{@link InterruptedException}
      */
     public void work() {
         try {
             impl_work();
         } catch (AssigningException ignored) {
+        } catch (InterruptedException ie) {
+            throw new RuntimeException(ie);
         } catch (Exception e) {
             notifier.notify(AMEvent.ERR_UNEXPECTED, e.toString());
             throw e;
@@ -101,10 +105,10 @@ public class AMFactory {
      * @throws AssigningException 发生已定义的异常
      * @see AMFactory#work()
      */
-    public void impl_work() throws AssigningException {
-        AssigningTable at = new AssigningTable(assigningTablePath, handler, notifier);
+    public void impl_work() throws AssigningException, InterruptedException {
+        AssigningTable at = new AssigningTable(assigningTablePath, handler, notifier, null);
         at.checkAndLoad();
-        MarkTable mt = new MarkTable(markTablePath, handler, outputPath, at, notifier);
+        MarkTable mt = new MarkTable(markTablePath, handler, outputPath, at, notifier, null);
         mt.checkAndLoad();
         mt.calcAssignedMarks();
     }

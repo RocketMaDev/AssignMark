@@ -1,5 +1,6 @@
 package cn.rocket.assaignmark.core;
 
+import cn.rocket.assaignmark.LocalURL;
 import cn.rocket.assaignmark.core.event.AMEvent;
 import cn.rocket.assaignmark.core.event.AMEventHandler;
 import cn.rocket.assaignmark.core.event.Notifier;
@@ -43,6 +44,9 @@ public class MarkTable {
     private final Notifier notifier;
     private final String outputPath;
     private final AssigningTable assigningTable;
+    private final String realParent;
+
+    private final Thread thisThread = Thread.currentThread();
 
     /**
      * 构造一个分数表实例，并允许使用给定的<code>notifier</code>，前提是继承该类。
@@ -57,18 +61,23 @@ public class MarkTable {
      * @param outputPath     输出赋分完毕的分数表路径
      * @param assigningTable 赋分表实例
      * @param _notifier      事件唤醒器实例
+     * @param parent         指定上述路径的父路径（若为相对路径），<code>null</code>表示为jar所在路径
      * @throws AssigningException 如果分数表无法加载
      * @see AMFactory
      * @see AMEvent
      * @see AMEventHandler
+     * @see LocalURL#JAR_PARENT_PATH
      */
-    protected MarkTable(String wbPath, AMEventHandler handler, String outputPath, AssigningTable assigningTable, Notifier _notifier) throws AssigningException {
+    protected MarkTable(String wbPath, AMEventHandler handler, String outputPath,
+                        AssigningTable assigningTable, Notifier _notifier, String parent)
+            throws AssigningException, InterruptedException {
         if (_notifier != null) {
             notifier = _notifier;
         } else {
             notifier = new Notifier(handler);
         }
-        if (AMFactory.defaultGetFile(wbPath).equals(AMFactory.defaultGetFile(outputPath))) {
+        realParent = parent == null ? LocalURL.JAR_PARENT_PATH : parent;
+        if (AMFactory.getFile(realParent, wbPath).equals(AMFactory.getFile(realParent, outputPath))) {
             notifier.notify(AMEvent.ERR_MT_EQUALS_OUT);
             throw new AssigningException();
         }
@@ -78,7 +87,7 @@ public class MarkTable {
         this.outputPath = outputPath;
         notifier.notify(AMEvent.LOAD_MT);
         try {
-            File wbFile = AMFactory.defaultGetFile(wbPath);
+            File wbFile = AMFactory.getFile(realParent, wbPath);
             OPCPackage pkg;
             // 处理大型xlsx表格
             if (wbFile.length() >= 5 * 1024 * 1024) // 5MiB
@@ -96,6 +105,9 @@ public class MarkTable {
             notifier.notify(AMEvent.ERR_READING_MT);
             throw new AssigningException(e);
         }
+
+        if (thisThread.isInterrupted())
+            interrupt();
     }
 
     /**
@@ -109,12 +121,15 @@ public class MarkTable {
      * @param handler        <code>AMEvent</code>事件处理器实例，<i>此项可为<code>null</code></i>
      * @param outputPath     输出赋分完毕的分数表路径
      * @param assigningTable 赋分表实例
+     * @param parent         指定上述路径的父路径（若为相对路径），<code>null</code>表示为jar所在路径
      * @throws AssigningException 如果分数表无法加载
      * @see AMEvent
      * @see AMEventHandler
+     * @see LocalURL#JAR_PARENT_PATH
      */
-    public MarkTable(String wbPath, AMEventHandler handler, String outputPath, AssigningTable assigningTable) throws AssigningException {
-        this(wbPath, handler, outputPath, assigningTable, null);
+    public MarkTable(String wbPath, AMEventHandler handler, String outputPath, AssigningTable assigningTable, String parent)
+            throws AssigningException, InterruptedException {
+        this(wbPath, handler, outputPath, assigningTable, null, parent);
     }
 
     /**
@@ -224,7 +239,7 @@ public class MarkTable {
      * @see MarkTable#readMarks(Sheet, int)
      * @see MarkTable#readSheetInfos(Sheet, int)
      */
-    public void checkAndLoad() throws AssigningException {
+    public void checkAndLoad() throws AssigningException, InterruptedException {
         if (allMarks != null) {
             return;
         }
@@ -260,10 +275,12 @@ public class MarkTable {
                     break;
             }
         for (int i = 0; i < SUBJECTS; i++) {
+            if (thisThread.isInterrupted())
+                interrupt();
+
             if (markSheets[i] == null)
                 continue;
             try {
-                notifier.notify(AMEvent.getIndexAt(AMEvent.ASSIGN_POLITICS.getIndex() + i));
                 readSheetInfos(markSheets[i], i);
                 readMarks(markSheets[i], i);
             } catch (IncorrectSheetException e) {
@@ -305,7 +322,7 @@ public class MarkTable {
      * @throws AssigningException 如果出现IO异常，如文档已打开
      * @see MarkTable#checkAndLoad()
      */
-    public void calcAssignedMarks() throws AssigningException {
+    public void calcAssignedMarks() throws AssigningException, InterruptedException {
         if (allMarks == null) {
             throw new NullPointerException("please invoke checkAndLoad() first.");
         }
@@ -325,18 +342,26 @@ public class MarkTable {
             throw new AssigningException(new EmptyMarkTableException());
         }
         for (int i = 0; i < SUBJECTS; i++) {
+            if (thisThread.isInterrupted())
+                interrupt();
+
             if (markSheets[i] == null)
                 continue;
+            notifier.notify(AMEvent.getIndexAt(AMEvent.ASSIGN_POLITICS.getIndex() + i));
             SingleMarkTable smt = new SingleMarkTable(allMarks[i], assigningTable.getReqrStageNums(
                     i, allSheetInfos[i][VALID_PERSONS]));
             int[] assignedMarks = smt.assignMark();
             writeAssignedMarks(i, assignedMarks);
         }
         notifier.notify(AMEvent.WRITE_OUT);
-        try (FileOutputStream out = new FileOutputStream(AMFactory.defaultGetFile(outputPath))) {
-            File f = AMFactory.defaultGetFile(outputPath);
+
+        if (thisThread.isInterrupted())
+            interrupt();
+
+        try (FileOutputStream out = new FileOutputStream(AMFactory.getFile(realParent, outputPath))) {
+            File f = AMFactory.getFile(realParent, outputPath);
             if (!f.exists())
-                //noinspection ResultOfMethodCallIgnored
+                // noinspection ResultOfMethodCallIgnored
                 f.createNewFile();
             markWorkbook.write(out);
         } catch (IOException e) {
@@ -350,6 +375,36 @@ public class MarkTable {
             }
         }
         notifier.notify(AMEvent.DONE);
+        if (thisThread.isInterrupted())
+            interrupt();
         notifier.shutdown();
+    }
+
+    /**
+     * 如果你不会使用到<code>calcAssignedMarks</code>，请使用此方法结束线程池
+     * <p>
+     * 请注意如果{@link AssigningTable}和{@link MarkTable}共享同一<code>notifier</code>，其会在执行完<code>calcAssignedMarks()</code>
+     * 后自动关闭，关闭后将导致后续操作因线程池关闭而抛出<code>{@link java.util.concurrent.RejectedExecutionException}</code>异常
+     *
+     * @return true - 成功关闭, false - 已关闭
+     * @see MarkTable#calcAssignedMarks()
+     */
+    public boolean shutdownNotifier() {
+        return notifier.shutdown();
+    }
+
+    /**
+     * 处理线程中断
+     *
+     * @throws InterruptedException 始终抛出
+     */
+    private void interrupt() throws InterruptedException {
+        notifier.notify(AMEvent.ERR_INTERRUPTED);
+        try {
+            markWorkbook.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        throw new InterruptedException();
     }
 }

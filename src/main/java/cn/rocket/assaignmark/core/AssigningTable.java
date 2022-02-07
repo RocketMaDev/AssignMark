@@ -1,5 +1,6 @@
 package cn.rocket.assaignmark.core;
 
+import cn.rocket.assaignmark.LocalURL;
 import cn.rocket.assaignmark.core.event.AMEvent;
 import cn.rocket.assaignmark.core.event.AMEventHandler;
 import cn.rocket.assaignmark.core.event.Notifier;
@@ -52,6 +53,8 @@ public class AssigningTable {
     private double[][] allReqrStageNums;
     private boolean[] isRatios;
 
+    private final Thread thisThread = Thread.currentThread();
+
     /**
      * 构造一个赋分表实例，并允许使用给定的<code>notifier</code>，前提是继承该类。
      * 若只是将其与分数表两两捆绑使用，请考虑<code>AMFactory</code>
@@ -63,23 +66,28 @@ public class AssigningTable {
      * @param wbPath    赋分表路径
      * @param handler   <code>AMEvent</code>事件处理器实例，<i>此项可为<code>null</code></i>
      * @param _notifier 事件唤醒器实例
+     * @param parent    指定上述路径的父路径（若为相对路径），<code>null</code>表示为jar所在路径
      * @throws AssigningException 如果赋分表无法加载
      * @see AMFactory
      * @see AMEvent
      * @see AMEventHandler
+     * @see LocalURL#JAR_PARENT_PATH
      */
-    protected AssigningTable(String wbPath, AMEventHandler handler, Notifier _notifier) throws AssigningException {
+    protected AssigningTable(String wbPath, AMEventHandler handler, Notifier _notifier, String parent)
+            throws AssigningException, InterruptedException {
         if (_notifier != null)
             notifier = _notifier;
         else
             notifier = new Notifier(handler);
         notifier.notify(AMEvent.LOAD_AT);
+        String realParent = parent == null ? LocalURL.JAR_PARENT_PATH : parent;
         try {
-            if (AMFactory.defaultGetFile(wbPath).length() > 1024 * 1024) { // 1MiB
+            if (AMFactory.getFile(realParent, wbPath)
+                    .length() > 1024 * 1024) { // 1MiB
                 notifier.notify(AMEvent.ERR_INVALID_AT);
                 throw new AssigningException();
             }
-            OPCPackage pkg = OPCPackage.open(new FileInputStream(AMFactory.defaultGetFile(wbPath)));
+            OPCPackage pkg = OPCPackage.open(new FileInputStream(AMFactory.getFile(realParent, wbPath)));
             wb = new XSSFWorkbook(pkg);
         } catch (OLE2NotOfficeXmlFileException | EmptyFileException | InvalidFormatException e) {
             notifier.notify(AMEvent.ERR_AT_INVALID_FORMAT);
@@ -92,6 +100,9 @@ public class AssigningTable {
             throw new AssigningException(e);
         }
         assigningSheet = wb.getSheetAt(0);
+
+        if (thisThread.isInterrupted())
+            interrupt(true);
     }
 
     /**
@@ -103,12 +114,14 @@ public class AssigningTable {
      *
      * @param wbPath  赋分表路径
      * @param handler <code>AMEvent</code>事件处理器实例，<i>此项可为<code>null</code></i>
+     * @param parent  指定上述路径的父路径（若为相对路径），<code>null</code>表示为jar所在路径
      * @throws AssigningException 如果赋分表无法加载
      * @see AMEvent
      * @see AMEventHandler
+     * @see LocalURL#JAR_PARENT_PATH
      */
-    public AssigningTable(String wbPath, AMEventHandler handler) throws AssigningException {
-        this(wbPath, handler, null);
+    public AssigningTable(String wbPath, AMEventHandler handler, String parent) throws AssigningException, InterruptedException {
+        this(wbPath, handler, null, parent);
     }
 
     /**
@@ -116,7 +129,7 @@ public class AssigningTable {
      *
      * @throws AssigningException 在检查读取赋分比例时出现了异常
      */
-    public void checkAndLoad() throws AssigningException {
+    public void checkAndLoad() throws AssigningException, InterruptedException {
         if (allReqrStageNums != null)
             return;
         notifier.notify(AMEvent.CHECK_AT);
@@ -192,12 +205,19 @@ public class AssigningTable {
                 ioException.printStackTrace();
             }
         }
+
+        if (thisThread.isInterrupted())
+            interrupt(false);
     }
 
     /**
      * 请使用此方法结束线程池
+     * <p>
+     * 请注意如果{@link AssigningTable}和{@link MarkTable}共享同一<code>notifier</code>，其会在执行完<code>calcAssignedMarks()</code>
+     * 后自动关闭
      *
      * @return true - 成功关闭, false - 已关闭
+     * @see MarkTable#calcAssignedMarks()
      */
     public boolean shutdownNotifier() {
         return notifier.shutdown();
@@ -234,5 +254,22 @@ public class AssigningTable {
      */
     boolean isNotLoaded() {
         return allReqrStageNums == null;
+    }
+
+    /**
+     * 处理线程中断
+     *
+     * @param closeWb 是否关闭<code>workbook</code>
+     * @throws InterruptedException 始终抛出
+     */
+    private void interrupt(boolean closeWb) throws InterruptedException {
+        notifier.notify(AMEvent.ERR_INTERRUPTED);
+        if (closeWb)
+            try {
+                wb.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        throw new InterruptedException();
     }
 }

@@ -41,6 +41,7 @@ AssignMark是一个针对于浙江省新赋分模式的赋分程序，本程序�
    <artifactId>AssignMark</artifactId>
    <version>1.0.8</version>
 </dependency>
+
 ```
 
 ## 未来计划
