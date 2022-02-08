@@ -107,7 +107,7 @@ public class MarkTable {
         }
 
         if (thisThread.isInterrupted())
-            interrupt();
+            interrupt(true);
     }
 
     /**
@@ -276,7 +276,7 @@ public class MarkTable {
             }
         for (int i = 0; i < SUBJECTS; i++) {
             if (thisThread.isInterrupted())
-                interrupt();
+                interrupt(true);
 
             if (markSheets[i] == null)
                 continue;
@@ -343,11 +343,11 @@ public class MarkTable {
         }
         for (int i = 0; i < SUBJECTS; i++) {
             if (thisThread.isInterrupted())
-                interrupt();
+                interrupt(true);
 
+            notifier.notify(AMEvent.getIndexAt(AMEvent.ASSIGN_POLITICS.getIndex() + i));
             if (markSheets[i] == null)
                 continue;
-            notifier.notify(AMEvent.getIndexAt(AMEvent.ASSIGN_POLITICS.getIndex() + i));
             SingleMarkTable smt = new SingleMarkTable(allMarks[i], assigningTable.getReqrStageNums(
                     i, allSheetInfos[i][VALID_PERSONS]));
             int[] assignedMarks = smt.assignMark();
@@ -356,7 +356,7 @@ public class MarkTable {
         notifier.notify(AMEvent.WRITE_OUT);
 
         if (thisThread.isInterrupted())
-            interrupt();
+            interrupt(true);
 
         try (FileOutputStream out = new FileOutputStream(AMFactory.getFile(realParent, outputPath))) {
             File f = AMFactory.getFile(realParent, outputPath);
@@ -374,9 +374,9 @@ public class MarkTable {
                 e.printStackTrace();
             }
         }
-        notifier.notify(AMEvent.DONE);
         if (thisThread.isInterrupted())
-            interrupt();
+            interrupt(false);
+        notifier.notify(AMEvent.DONE);
         notifier.shutdown();
     }
 
@@ -396,15 +396,17 @@ public class MarkTable {
     /**
      * 处理线程中断
      *
+     * @param closeWb 是否关闭<code>workbook</code>
      * @throws InterruptedException 始终抛出
      */
-    private void interrupt() throws InterruptedException {
+    private void interrupt(boolean closeWb) throws InterruptedException {
         notifier.notify(AMEvent.ERR_INTERRUPTED);
-        try {
-            markWorkbook.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        if (closeWb)
+            try {
+                markWorkbook.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         throw new InterruptedException();
     }
 }

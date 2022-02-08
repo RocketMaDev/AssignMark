@@ -75,4 +75,8 @@ public enum AMEvent {
     public int getIndex() {
         return index;
     }
+
+    public static AMEvent getLastEvent() {
+        return ERR_INTERRUPTED;
+    }
 }
