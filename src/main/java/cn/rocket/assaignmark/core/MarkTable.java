@@ -16,6 +16,8 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.*;
 
+import static cn.rocket.assaignmark.core.AMFactory.attachUnclosedEvent;
+import static cn.rocket.assaignmark.core.AMFactory.getExceptionStack;
 import static cn.rocket.assaignmark.core.AssigningTable.*;
 
 /**
@@ -284,13 +286,15 @@ public class MarkTable {
                 readSheetInfos(markSheets[i], i);
                 readMarks(markSheets[i], i);
             } catch (IncorrectSheetException e) {
+                IOException ioe = null;
                 try {
                     markWorkbook.close();
                 } catch (IOException ioException) {
-                    ioException.printStackTrace(); // Unexpected
+                    ioe = ioException;
                 }
                 notifier.notify(AMEvent.ERR_MT_INCORRECT_FORMAT,
-                        "第一个出现问题的是学科 " + SUBJECT_NAMES[i] + " 请一并检查剩余学科");
+                        ioe == null ? "第一个出现问题的是学科 " + SUBJECT_NAMES[i] + " 请一并检查剩余学科"
+                                : attachUnclosedEvent(ioe));
                 throw new AssigningException(e);
             }
         }
@@ -333,13 +337,14 @@ public class MarkTable {
                 break;
             }
         if (allEmpty) {
+            IOException ioe = null;
             try {
                 markWorkbook.close();
             } catch (IOException e) {
-                e.printStackTrace();
+                ioe = e;
             }
-            notifier.notify(AMEvent.ERR_MT_EMPTY);
-            throw new AssigningException(new EmptyMarkTableException());
+            notifier.notify(AMEvent.ERR_MT_EMPTY, ioe == null ? null : attachUnclosedEvent(ioe));
+            throw new EmptyMarkTableException();
         }
         for (int i = 0; i < SUBJECTS; i++) {
             if (thisThread.isInterrupted())
@@ -365,14 +370,20 @@ public class MarkTable {
                 f.createNewFile();
             markWorkbook.write(out);
         } catch (IOException e) {
-            notifier.notify(AMEvent.ERR_FAILED_TO_WRITE);
-            throw new AssigningException(e);
-        } finally {
+            IOException ioe = null;
             try {
                 markWorkbook.close();
-            } catch (IOException e) {
-                e.printStackTrace();
+            } catch (IOException ee) {
+                ioe = ee;
             }
+            notifier.notify(AMEvent.ERR_FAILED_TO_WRITE, ioe == null ? null : attachUnclosedEvent(ioe));
+            throw new AssigningException(e);
+        }
+        try {
+            markWorkbook.close();
+        } catch (IOException e) {
+            notifier.notify(AMEvent.ERR_FAILED_TO_CLOSE, getExceptionStack(e));
+            throw new AssigningException(e);
         }
         if (thisThread.isInterrupted())
             interrupt(false);
@@ -400,13 +411,15 @@ public class MarkTable {
      * @throws InterruptedException 始终抛出
      */
     private void interrupt(boolean closeWb) throws InterruptedException {
-        notifier.notify(AMEvent.ERR_INTERRUPTED);
-        if (closeWb)
+        if (closeWb) {
             try {
                 markWorkbook.close();
             } catch (IOException e) {
-                e.printStackTrace();
+                notifier.notify(AMEvent.ERR_INTERRUPTED, attachUnclosedEvent(e));
+                throw new InterruptedException();
             }
+        }
+        notifier.notify(AMEvent.ERR_INTERRUPTED);
         throw new InterruptedException();
     }
 }

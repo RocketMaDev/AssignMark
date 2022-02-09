@@ -35,7 +35,8 @@ public enum AMEvent {
     ERR_MT_EMPTY(42),
     ERR_MT_EQUALS_OUT(43),
     ERR_UNEXPECTED(44),
-    ERR_INTERRUPTED(45);
+    ERR_INTERRUPTED(45),
+    ERR_FAILED_TO_CLOSE(46);
 
     /**
      * 每个事件的索引
@@ -59,7 +60,7 @@ public enum AMEvent {
      * @see IllegalArgumentException
      */
     public static AMEvent getIndexAt(int index) {
-        if (index < 0 || index > ERR_INTERRUPTED.index || index > DONE.index && index < ERR_AT_NOT_FOUND.index)
+        if (index < 0 || index > getLastEvent().index || index > DONE.index && index < ERR_AT_NOT_FOUND.index)
             throw new IllegalArgumentException("未知索引");
         if (index <= DONE.index)
             return AMEvent.values()[index];
@@ -77,6 +78,6 @@ public enum AMEvent {
     }
 
     public static AMEvent getLastEvent() {
-        return ERR_INTERRUPTED;
+        return AMEvent.values()[AMEvent.values().length - 1];
     }
 }

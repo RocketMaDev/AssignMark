@@ -6,10 +6,7 @@ import cn.rocket.assaignmark.core.event.AMEventHandler;
 import cn.rocket.assaignmark.core.event.Notifier;
 import cn.rocket.assaignmark.core.exception.AssigningException;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -129,5 +126,15 @@ public class AMFactory {
 
     public static File defaultGetFile(String path) {
         return getFile(LocalURL.JAR_PARENT_PATH, path);
+    }
+
+    public static String getExceptionStack(Exception e) {
+        StringWriter writer = new StringWriter();
+        e.printStackTrace(new PrintWriter(writer));
+        return writer.toString();
+    }
+
+    public static String attachUnclosedEvent(IOException e) {
+        return AMEvent.ERR_FAILED_TO_CLOSE + ":\n" + getExceptionStack(e);
     }
 }

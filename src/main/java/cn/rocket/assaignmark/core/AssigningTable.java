@@ -22,6 +22,9 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import static cn.rocket.assaignmark.core.AMFactory.attachUnclosedEvent;
+import static cn.rocket.assaignmark.core.AMFactory.getExceptionStack;
+
 /**
  * 赋分表类
  * 用来存储赋分比例信息
@@ -148,13 +151,14 @@ public class AssigningTable {
             if (c == null || !formatter.formatCellValue(c).equals("Rocket"))
                 throw new InvalidTableException();
         } catch (InvalidTableException e) {
-            notifier.notify(AMEvent.ERR_INVALID_AT);
+            IOException ioe = null;
             try {
                 wb.close();
-            } catch (IOException ioException) {
-                ioException.printStackTrace();
+            } catch (IOException ee) {
+                ioe = ee;
             }
-            throw new AssigningException(e);
+            notifier.notify(AMEvent.ERR_INVALID_AT, ioe == null ? null : attachUnclosedEvent(ioe));
+            throw e;
         }
 
 
@@ -168,13 +172,14 @@ public class AssigningTable {
                 try {
                     throw new IncorrectSheetException();
                 } catch (IncorrectSheetException e) {
-                    notifier.notify(AMEvent.ERR_AT_INCORRECT_FORMAT);
+                    IOException ioe = null;
                     try {
                         wb.close();
-                    } catch (IOException ioException) {
-                        ioException.printStackTrace();
+                    } catch (IOException ee) {
+                        ioe = ee;
                     }
-                    throw new AssigningException(e);
+                    notifier.notify(AMEvent.ERR_AT_INCORRECT_FORMAT, ioe == null ? null : attachUnclosedEvent(ioe));
+                    throw e;
                 }
         }
 
@@ -196,14 +201,20 @@ public class AssigningTable {
                     }
                 }
         } catch (IncorrectSheetException | NumberFormatException e) {
-            notifier.notify(AMEvent.ERR_AT_INCORRECT_FORMAT);
-            throw new AssigningException(e);
-        } finally {
+            IOException ioe = null;
             try {
                 wb.close();
-            } catch (IOException ioException) {
-                ioException.printStackTrace();
+            } catch (IOException ee) {
+                ioe = ee;
             }
+            notifier.notify(AMEvent.ERR_AT_INCORRECT_FORMAT, ioe == null ? null : attachUnclosedEvent(ioe));
+            throw new AssigningException(e);
+        }
+        try {
+            wb.close();
+        } catch (IOException e) {
+            notifier.notify(AMEvent.ERR_FAILED_TO_CLOSE, getExceptionStack(e));
+            throw new AssigningException(e);
         }
 
         if (thisThread.isInterrupted())
@@ -263,13 +274,15 @@ public class AssigningTable {
      * @throws InterruptedException 始终抛出
      */
     private void interrupt(boolean closeWb) throws InterruptedException {
-        notifier.notify(AMEvent.ERR_INTERRUPTED);
-        if (closeWb)
+        if (closeWb) {
             try {
                 wb.close();
             } catch (IOException e) {
-                e.printStackTrace();
+                notifier.notify(AMEvent.ERR_INTERRUPTED, attachUnclosedEvent(e));
+                throw new InterruptedException();
             }
+        }
+        notifier.notify(AMEvent.ERR_INTERRUPTED);
         throw new InterruptedException();
     }
 }
