@@ -7,6 +7,8 @@ import cn.rocket.assaignmark.core.event.Notifier;
 import cn.rocket.assaignmark.core.exception.AssigningException;
 import cn.rocket.assaignmark.core.exception.IncorrectSheetException;
 import cn.rocket.assaignmark.core.exception.InvalidTableException;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.poi.EmptyFileException;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.openxml4j.exceptions.OLE2NotOfficeXmlFileException;
@@ -284,5 +286,21 @@ public class AssigningTable {
         }
         notifier.notify(AMEvent.ERR_INTERRUPTED);
         throw new InterruptedException();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof AssigningTable))
+            return false;
+        if (this == obj)
+            return true;
+        AssigningTable rhs = (AssigningTable) obj;
+        return new EqualsBuilder().append(allReqrStageNums, rhs.allReqrStageNums)
+                .append(isRatios, rhs.isRatios).isEquals();
+    }
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this).append("workbook", wb).build();
     }
 }

@@ -89,7 +89,7 @@ public class AMFactory {
         } catch (InterruptedException ie) {
             throw new RuntimeException(ie);
         } catch (Exception e) {
-            notifier.notify(AMEvent.ERR_UNEXPECTED, e.toString());
+            notifier.notify(AMEvent.ERR_UNEXPECTED, getExceptionStack(e));
             throw e;
         }
     }

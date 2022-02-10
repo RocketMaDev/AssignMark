@@ -17,7 +17,7 @@ import java.util.Scanner;
  * @since 0.9.8
  */
 public class Processor extends Main {
-    public static final String[] msgList = {
+    public static final String[] MSG_ARR = {
             "正在加载赋分表...", "正在检查赋分表...", "正在加载分数表...", "正在检查分数表...",
             "正在赋分 政治 ...", "正在赋分 历史 ...", "正在赋分 地理 ...", "正在赋分 物理 ...", "正在赋分 化学 ...",
             "正在赋分 生物 ...", "正在赋分 技术 ...", "正在导出...", "完成！",
@@ -85,11 +85,11 @@ public class Processor extends Main {
         }
         AMEventHandler handler = (e, msg) -> {
             if (e.getIndex() >= AMEvent.ERR_AT_NOT_FOUND.getIndex()) {
-                LOGGER.fatal(msgList[e.ordinal()]);
+                LOGGER.fatal(MSG_ARR[e.ordinal()]);
                 if (msg != null)
                     LOGGER.error(msg);
             } else
-                LOGGER.info(msgList[e.ordinal()]);
+                LOGGER.info(MSG_ARR[e.ordinal()]);
         };
         assert assigningTablePath != null && markTablePath != null && outputPath != null;
         new AMFactory(assigningTablePath, markTablePath, handler, outputPath).work();

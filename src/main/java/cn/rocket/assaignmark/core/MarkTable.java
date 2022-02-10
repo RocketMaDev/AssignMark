@@ -7,6 +7,8 @@ import cn.rocket.assaignmark.core.event.Notifier;
 import cn.rocket.assaignmark.core.exception.AssigningException;
 import cn.rocket.assaignmark.core.exception.EmptyMarkTableException;
 import cn.rocket.assaignmark.core.exception.IncorrectSheetException;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.poi.EmptyFileException;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.openxml4j.exceptions.OLE2NotOfficeXmlFileException;
@@ -16,8 +18,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.*;
 
-import static cn.rocket.assaignmark.core.AMFactory.attachUnclosedEvent;
-import static cn.rocket.assaignmark.core.AMFactory.getExceptionStack;
+import static cn.rocket.assaignmark.core.AMFactory.*;
 import static cn.rocket.assaignmark.core.AssigningTable.*;
 
 /**
@@ -79,17 +80,17 @@ public class MarkTable {
             notifier = new Notifier(handler);
         }
         realParent = parent == null ? LocalURL.JAR_PARENT_PATH : parent;
-        if (AMFactory.getFile(realParent, wbPath).equals(AMFactory.getFile(realParent, outputPath))) {
+        if (getFile(realParent, wbPath).equals(getFile(realParent, outputPath))) {
             notifier.notify(AMEvent.ERR_MT_EQUALS_OUT);
             throw new AssigningException();
         }
         if (assigningTable == null || assigningTable.isNotLoaded())
             throw new NullPointerException("assigningTable can not null or empty!");
         this.assigningTable = assigningTable;
-        this.outputPath = outputPath;
+        this.outputPath = getFile(realParent, outputPath).getAbsolutePath();
         notifier.notify(AMEvent.LOAD_MT);
         try {
-            File wbFile = AMFactory.getFile(realParent, wbPath);
+            File wbFile = getFile(realParent, wbPath);
             OPCPackage pkg;
             // 处理大型xlsx表格
             if (wbFile.length() >= 5 * 1024 * 1024) // 5MiB
@@ -363,8 +364,8 @@ public class MarkTable {
         if (thisThread.isInterrupted())
             interrupt(true);
 
-        try (FileOutputStream out = new FileOutputStream(AMFactory.getFile(realParent, outputPath))) {
-            File f = AMFactory.getFile(realParent, outputPath);
+        try (FileOutputStream out = new FileOutputStream(getFile(realParent, outputPath))) {
+            File f = new File(outputPath);
             if (!f.exists())
                 // noinspection ResultOfMethodCallIgnored
                 f.createNewFile();
@@ -421,5 +422,25 @@ public class MarkTable {
         }
         notifier.notify(AMEvent.ERR_INTERRUPTED);
         throw new InterruptedException();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof MarkTable))
+            return false;
+        if (this == obj)
+            return true;
+        MarkTable rhs = (MarkTable) obj;
+        return new EqualsBuilder().append(markWorkbook, rhs.markWorkbook)
+                .append(outputPath, rhs.outputPath)
+                .append(assigningTable, rhs.assigningTable).isEquals();
+    }
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this).append("assigningTable", assigningTable)
+                .append("notifier", notifier)
+                .append("workbook", markWorkbook)
+                .append("outputPath", outputPath).build();
     }
 }

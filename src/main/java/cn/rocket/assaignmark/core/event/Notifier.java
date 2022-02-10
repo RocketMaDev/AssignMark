@@ -1,5 +1,7 @@
 package cn.rocket.assaignmark.core.event;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
+
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -80,5 +82,11 @@ public class Notifier {
             return false;
         executor.shutdown();
         return true;
+    }
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this).append("executor", executor)
+                .append("handler", handler).build();
     }
 }

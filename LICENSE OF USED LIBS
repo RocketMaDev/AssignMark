@@ -68,13 +68,17 @@ porting other OOXML and OLE2 formats and welcome others to participate.
 
 --------------------------------------------------------------------------
 
-- commons-cli - From apache - Apache License 2.0 -
+- commons - From apache - Apache License 2.0 -
 
-The Apache Commons CLI library provides an API for parsing command line
-options passed to programs. It's also able to print help messages detailing
-the options available for a command line tool.
+Commons Proper is dedicated to one principal goal: creating and maintaining
+reusable Java components. The Commons Proper is a place for collaboration
+and sharing, where developers from throughout the Apache community can
+work together on projects to be shared by the Apache projects and Apache
+users.
 
 > https://www.apache.org/licenses/
+
+* including commons-cli & commons-lang
 
 --------------------------------------------------------------------------
 

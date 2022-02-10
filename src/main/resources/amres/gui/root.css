@@ -26,3 +26,7 @@
 .jfx-text-field {
     -jfx-focus-color: DODGERBLUE;
 }
+
+.jfx-progress-bar > .bar {
+    -fx-background-color: DODGERBLUE;
+}

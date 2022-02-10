@@ -10,7 +10,9 @@ import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXProgressBar;
 import com.jfoenix.controls.JFXTextField;
 import javafx.application.Platform;
+import javafx.event.ActionEvent;
 import javafx.event.Event;
+import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -20,10 +22,19 @@ import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import org.apache.logging.log4j.LogManager;
 
+import java.awt.*;
+import java.awt.datatransfer.StringSelection;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Date;
 
 /**
  * @author Rocket
@@ -171,9 +182,6 @@ public class Controller {
         {
             Platform.runLater(() -> {
                 progressBar.setVisible(true);
-                progressBar.setStyle(".jfx-progress-bar>.bar {\n" +
-                        "    -fx-background-color: DODGERBLUE;\n" +
-                        "}");
                 progressBar.setProgress(-1);
                 progressLabel.setText(String.format("%d/%d", 0, max));
                 statusLabel.setText("正在初始化...");
@@ -187,26 +195,48 @@ public class Controller {
                 if (index < AMEvent.DONE.getIndex()) {
                     progressBar.setProgress((double) (index + 1) / max);
                     progressLabel.setText(String.format("%d/%d", index + 1, max));
-                    statusLabel.setText(Processor.msgList[index]);
+                    statusLabel.setText(Processor.MSG_ARR[index]);
                 } else if (index == AMEvent.DONE.getIndex()) {
-                    progressBar.setStyle(".jfx-progress-bar>.bar {\n" +
-                            "    -fx-background-color: GREEN;\n" +
-                            "}");
                     progressBar.setProgress(1);
                     progressLabel.setText(String.format("%d/%d", max, max));
-                    statusLabel.setText(Processor.msgList[index]);
+                    statusLabel.setText(Processor.MSG_ARR[index]);
 
-                    Alert alert = new Alert(Processor.msgList[index], ctrler, HintType.DONE, false);
+                    Alert alert = new Alert(Processor.MSG_ARR[index], ctrler, HintType.DONE, false);
                     alert.setEventHandler(null, null);
                     alert.show();
                 } else if (index <= AMEvent.getLastEvent().getIndex()) {
-                    progressBar.setStyle(".jfx-progress-bar>.bar {\n" +
-                            "    -fx-background-color: RED;\n" +
-                            "}");
+                    String message = Processor.MSG_ARR[event.ordinal()];
+                    boolean unexpected = false;
+                    if (msg != null) {
+                        message += "\n";
+                        if (msg.startsWith(AMEvent.ERR_FAILED_TO_CLOSE.toString()) || event == AMEvent.ERR_UNEXPECTED) {
+                            unexpected = true;
+                            message += msg.substring(0, msg.indexOf('\n',
+                                    AMEvent.ERR_FAILED_TO_CLOSE.toString().length() + 2)); // ERR_FAILED_TO_CLOSE\n_
+
+                            String name = new Date().toString();
+                            Path path = Paths.get(LocalURL.JAR_PARENT_PATH, "/", name, ".txt");
+                            try (BufferedWriter writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8)) {
+                                writer.write(msg);
+                            } catch (IOException e) {
+                                LogManager.getRootLogger().error("Can't write error log out!");
+                            }
+
+                            //TODO IOException 测试
+                            message += "\n发生意料之外的异常，已保存到jar路径下的文件中，" +
+                                    "按确定以复制错误信息（建议复制到word中防止丢失），并请到GitHub/Gitee上发issue";
+                        } else
+                            message += msg;
+                    }
                     statusLabel.setText(statusLabel.getText() + "  失败！");
-                    String message = Processor.msgList[event.ordinal()] + (msg == null ? "" : "\n" + msg);
-                    Alert alert = new Alert(message, ctrler, HintType.ERROR, false);
-                    alert.setEventHandler(null, null);
+                    Alert alert = new Alert(message, ctrler, HintType.ERROR, true);
+                    EventHandler<ActionEvent> handler = null;
+                    if (unexpected)
+                        handler = event1 -> {
+                            Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(msg), null);
+                            alert.close();
+                        };
+                    alert.setEventHandler(handler, null);
                     alert.show();
                 }
             });
