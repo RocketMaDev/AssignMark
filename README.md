@@ -43,6 +43,23 @@ AssignMark是一个针对于浙江省新赋分模式的赋分程序，本程序�
 </dependency>
 ```
 
+## 快速上手
+
+```java
+String atPath = ... // 赋分表路径
+String mtPath = ... // 分数表路径
+String outPath = ... // 输出路径
+AMEventHandler handler = (event, msg) -> {
+    if (event.getIndex() < AMEvent.ERR_AT_NOTFOUND.getIndex())
+        System.out.println(event.toString());
+    else
+        System.err.println(event.toString());
+    if (msg != null)
+        System.err.println(msg);
+};
+new AMFactory(atPath, mtPath, handler, outPath).Work();
+```
+
 ## 未来计划
 
 - [ ] 完成图形化界面`(1.1.8)`
