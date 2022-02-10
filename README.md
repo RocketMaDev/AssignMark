@@ -3,7 +3,7 @@
 ## 项目简介
 
 AssignMark是一个针对于浙江省新赋分模式的赋分程序，本程序完全开源免费  
-有任何问题，请发issue。[Gitee]("https://gitee.com/rocketma/AssignMark") 的仓库会同步稳定版，下载速度更快
+有任何问题，请发issue（在上方）。[Gitee]("https://gitee.com/rocketma/AssignMark") 的仓库会同步稳定版，下载速度更快
 
 要使用该程序，请安装[Java8]("https://java.com/zh-CN/") ，使用方法见下方， 然后在Release中下载发布版（一般下载 **"-with-dependencies"文件，文件比较大** ）
 
@@ -20,15 +20,17 @@ AssignMark是一个针对于浙江省新赋分模式的赋分程序，本程序�
 | -e  | \   | 导出赋分表模板到当前路径            |
 | -h  | \   | 打印帮助                    |
 
-2. 图形化界面  
-   无参启动，即双击打开，当前版本尚未完成，请考虑命令行方式
-
-使用举例：  
-在当前文件夹路径框双击，输入`cmd`，将会跳出命令行界面，在安装完Java后，输入
+   使用举例：  
+   在当前文件夹路径框双击，输入`cmd`，将会跳出命令行界面，在安装完Java后，输入
 
 ```shell
 > java -jar AssignMark.jar -A 赋分表.xlsx -I 分数表.xlsx -O 导出.xlsx
 ```
+
+
+2. 图形化界面  
+   无参启动，即双击打开，按"开始赋分"上方的导出按钮导出模板赋分表到jar所在路径中，仔细阅读填写后，按文件夹按钮，选择正确的文件，按"开始赋分"。
+   按左下角版权按钮来打开"关于"窗口。
 
 ## 引用本库
 
@@ -37,9 +39,9 @@ AssignMark是一个针对于浙江省新赋分模式的赋分程序，本程序�
 ```xml
 
 <dependency>
-   <groupId>io.github.rocketmadev</groupId>
-   <artifactId>AssignMark</artifactId>
-   <version>1.0.8</version>
+    <groupId>io.github.rocketmadev</groupId>
+    <artifactId>AssignMark</artifactId>
+    <version>1.0.8</version>
 </dependency>
 
 ```
@@ -51,19 +53,23 @@ String atPath = ... // 赋分表路径
 String mtPath = ... // 分数表路径
 String outPath = ... // 输出路径
 AMEventHandler handler = (event, msg) -> {
-    if (event.getIndex() < AMEvent.ERR_AT_NOTFOUND.getIndex())
+    if (event.getIndex() < AMEvent.ERR_AT_NOT_FOUND.getIndex())
         System.out.println(event.toString());
     else
         System.err.println(event.toString());
     if (msg != null)
         System.err.println(msg);
 };
-new AMFactory(atPath, mtPath, handler, outPath).Work();
+try {
+    new AMFactory(atPath, mtPath, handler, outPath).work();
+} catch (Exception e) {
+    // 自行处理    
+}
 ```
 
 ## 未来计划
 
-- [ ] 完成图形化界面`(1.1.8)`
+- [x] 完成图形化界面`(1.1.8)`
 - [ ] 写Java17的版本`(1.1.17)`
 
 ## 版权声明
