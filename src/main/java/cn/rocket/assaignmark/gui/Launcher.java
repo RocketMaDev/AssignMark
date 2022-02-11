@@ -27,8 +27,9 @@ public class Launcher extends Application {
 
     /**
      * {@inheritDoc}
-     *
+     * <p>
      * 图形化程序“入口”
+     *
      * @param primaryStage
      */
     @Override

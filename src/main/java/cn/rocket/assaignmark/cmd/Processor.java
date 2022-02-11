@@ -34,6 +34,7 @@ public class Processor extends Main {
 
     /**
      * 命令行工具主入口
+     *
      * @param args 命令行参数
      */
     public static void main(String[] args) {
@@ -104,6 +105,7 @@ public class Processor extends Main {
 
     /**
      * 判断文件是否为同一个（绝对）
+     *
      * @param path0 第一个文件路径
      * @param path1 第二个文件路径
      * @return 构造出的文件是否为同一个(canonical)

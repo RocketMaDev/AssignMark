@@ -13,7 +13,7 @@ import org.apache.logging.log4j.Logger;
  */
 public class Main {
 
-    protected static final Logger LOGGER = LogManager.getLogger();
+    protected static final Logger LOGGER = LogManager.getLogger(Main.class);
 
     /**
      * 程序主入口

@@ -16,6 +16,12 @@ public final class LocalURL {
     private LocalURL() {
     }
 
+    // User associated
+    public static final String USER_PATH = System.getProperty("user.home") + "/"; // with /
+    public static final String FOLDER_PATH = USER_PATH + ".rocketdev/";
+    public static final String WORK_PATH = FOLDER_PATH + "AssignMark/";
+    public static final String PROPERTIES_PATH = WORK_PATH + "default.properties";
+
     // Jar associated
     public static final String JAR_PATH; // with /
     public static final String JAR_PARENT_PATH; // with /

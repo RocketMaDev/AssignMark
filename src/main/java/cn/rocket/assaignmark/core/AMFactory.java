@@ -62,8 +62,9 @@ public class AMFactory {
 
     /**
      * 尝试提取赋分表模板，会在<code>parentPath</code>中尝试11次，以 <code>"赋分表"+数字+".xlsx"</code> 命名
+     *
      * @param parentPath 尝试新建文件的路径
-     * @throws IOException 如果无法创建文件
+     * @throws IOException        如果无法创建文件
      * @throws AssigningException 如果过多赋分表已存在在当前路径
      */
     public static void tryToExtract(String parentPath) throws IOException, AssigningException {

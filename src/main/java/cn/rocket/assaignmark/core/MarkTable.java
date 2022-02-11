@@ -451,6 +451,6 @@ public class MarkTable {
                 .append("notifier", notifier)
                 .append("workbook", markWorkbook)
                 .append("outputPath", outputPath)
-                .append("loaded",allMarks!=null).build();
+                .append("loaded", allMarks != null).build();
     }
 }
