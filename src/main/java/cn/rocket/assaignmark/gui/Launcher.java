@@ -18,10 +18,19 @@ import java.io.IOException;
 public class Launcher extends Application {
     static Stage mainStage;
 
+    /**
+     * 调用以启动图形化程序启动，避免在高版本ClassNotFound
+     */
     public static void launchSelf() {
         Application.launch(Launcher.class);
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * 图形化程序“入口”
+     * @param primaryStage
+     */
     @Override
     public void start(Stage primaryStage) {
         FXMLLoader loader = new FXMLLoader(this.getClass().getResource(LocalURL.MAIN_FXML_PATH));

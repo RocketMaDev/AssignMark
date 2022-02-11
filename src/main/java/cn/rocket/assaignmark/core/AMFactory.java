@@ -18,7 +18,7 @@ import java.nio.file.StandardCopyOption;
  * 用以提供便捷的生成打包的赋分对象的服务
  *
  * @author Rocket
- * @version 1.0.8
+ * @version 1.1.8
  * @since 0.9.8
  */
 public class AMFactory {
@@ -60,6 +60,12 @@ public class AMFactory {
         }
     }
 
+    /**
+     * 尝试提取赋分表模板，会在<code>parentPath</code>中尝试11次，以 <code>"赋分表"+数字+".xlsx"</code> 命名
+     * @param parentPath 尝试新建文件的路径
+     * @throws IOException 如果无法创建文件
+     * @throws AssigningException 如果过多赋分表已存在在当前路径
+     */
     public static void tryToExtract(String parentPath) throws IOException, AssigningException {
         if (parentPath.charAt(parentPath.length() - 1) != File.separatorChar)
             parentPath += "/";
@@ -110,6 +116,13 @@ public class AMFactory {
         mt.calcAssignedMarks();
     }
 
+    /**
+     * 返回<code>child</code>指向的文件，自动判断是相对的还是绝对的
+     *
+     * @param parent 如果<code>child</code>是相对路径，那么以其为父路径
+     * @param child  如果为绝对路径，则不变，否则用<code>parent</code>补全路径
+     * @return 对应的 {@code File} 对象，使用处理过的路径（<code>canonical</code>）
+     */
     public static File getFile(String parent, String child) {
         File file = new File(child);
         File outFile;
@@ -124,16 +137,37 @@ public class AMFactory {
         }
     }
 
+    /**
+     * 返回<code>path</code>指向的文件
+     *
+     * @param path 如果为绝对路径，则不变，否则用jar所在路径补全路径
+     * @return 对应的 {@code File} 对象，使用处理过的路径（<code>canonical</code>）
+     * @see AMFactory#getFile(String, String)
+     */
     public static File defaultGetFile(String path) {
         return getFile(LocalURL.JAR_PARENT_PATH, path);
     }
 
+    /**
+     * 将异常打印到字符串中
+     *
+     * @param e 要保存的异常
+     * @return 包含异常栈帧的字符串
+     */
     public static String getExceptionStack(Exception e) {
         StringWriter writer = new StringWriter();
         e.printStackTrace(new PrintWriter(writer));
         return writer.toString();
     }
 
+    /**
+     * 将异常打印到字符串中，并附加<i>未关闭的文件</i>事件到开头
+     *
+     * @param e 要包含的异常
+     * @return 包含事件与异常栈帧信息的字符串
+     * @see AMEvent#ERR_FAILED_TO_CLOSE
+     * @see AMFactory#getExceptionStack(Exception)
+     */
     public static String attachUnclosedEvent(IOException e) {
         return AMEvent.ERR_FAILED_TO_CLOSE + ":\n" + getExceptionStack(e);
     }

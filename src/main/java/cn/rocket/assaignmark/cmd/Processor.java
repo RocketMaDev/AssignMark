@@ -17,6 +17,9 @@ import java.util.Scanner;
  * @since 0.9.8
  */
 public class Processor extends Main {
+    /**
+     * 用于命令行的赋分事件数组，与<code>AMEvent</code>中的每个事件的<code>ordinal</code>一一对应
+     */
     public static final String[] MSG_ARR = {
             "正在加载赋分表...", "正在检查赋分表...", "正在加载分数表...", "正在检查分数表...",
             "正在赋分 政治 ...", "正在赋分 历史 ...", "正在赋分 地理 ...", "正在赋分 物理 ...", "正在赋分 化学 ...",
@@ -29,6 +32,10 @@ public class Processor extends Main {
             "错误： 无法关闭工作表"
     };
 
+    /**
+     * 命令行工具主入口
+     * @param args 命令行参数
+     */
     public static void main(String[] args) {
         CommandLineParser parser = new DefaultParser();
         Options options = new Options();
@@ -95,6 +102,12 @@ public class Processor extends Main {
         new AMFactory(assigningTablePath, markTablePath, handler, outputPath).work();
     }
 
+    /**
+     * 判断文件是否为同一个（绝对）
+     * @param path0 第一个文件路径
+     * @param path1 第二个文件路径
+     * @return 构造出的文件是否为同一个(canonical)
+     */
     public static boolean fileEqual(String path0, String path1) {
         File one = new File(path0);
         File other = new File(path1);

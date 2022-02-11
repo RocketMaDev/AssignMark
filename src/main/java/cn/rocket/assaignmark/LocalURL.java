@@ -28,7 +28,6 @@ public final class LocalURL {
     private static final String GUI_PATH = RES_PATH + "gui/";
     public static final String MAIN_FXML_PATH = GUI_PATH + "Main.fxml";
     public static final String COPYRIGHT_FXML_PATH = GUI_PATH + "Copyright.fxml";
-    public static final String ROOT_CSS_PATH = GUI_PATH + "root.css";
     public static final String ICON_PATH = GUI_PATH + "icon.png";
     public static final String ALERT_CSS_PATH = GUI_PATH + "alert.css";
     public static final String ICON_ERROR_PATH = GUI_PATH + "error.png";

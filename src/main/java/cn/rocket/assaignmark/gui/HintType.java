@@ -3,6 +3,8 @@ package cn.rocket.assaignmark.gui;
 import cn.rocket.assaignmark.LocalURL;
 
 /**
+ * 对话框中的提示类型枚举
+ *
  * @author Rocket
  * @version 1.0.8
  * @since 1.0.8

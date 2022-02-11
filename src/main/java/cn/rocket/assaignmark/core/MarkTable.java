@@ -8,12 +8,14 @@ import cn.rocket.assaignmark.core.exception.AssigningException;
 import cn.rocket.assaignmark.core.exception.EmptyMarkTableException;
 import cn.rocket.assaignmark.core.exception.IncorrectSheetException;
 import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.poi.EmptyFileException;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.openxml4j.exceptions.OLE2NotOfficeXmlFileException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.usermodel.Row.MissingCellPolicy;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.*;
@@ -26,7 +28,7 @@ import static cn.rocket.assaignmark.core.AssigningTable.*;
  * 用来进行赋分
  *
  * @author Rocket
- * @version 1.0.8
+ * @version 1.1.8
  * @since 0.9.8
  */
 public class MarkTable {
@@ -48,8 +50,6 @@ public class MarkTable {
     private final String outputPath;
     private final AssigningTable assigningTable;
     private final String realParent;
-
-    private final Thread thisThread = Thread.currentThread();
 
     /**
      * 构造一个分数表实例，并允许使用给定的<code>notifier</code>，前提是继承该类。
@@ -109,7 +109,7 @@ public class MarkTable {
             throw new AssigningException(e);
         }
 
-        if (thisThread.isInterrupted())
+        if (Thread.interrupted())
             interrupt(true);
     }
 
@@ -184,7 +184,7 @@ public class MarkTable {
             if (row == null)
                 continue;
             c = row.getCell(hp);
-            if (c != null && c.getCellType().equals(CellType.NUMERIC)) {
+            if (c != null && c.getCellType() == CellType.NUMERIC) {
                 infos[START_ROW] = i;
                 break;
             }
@@ -200,7 +200,7 @@ public class MarkTable {
             if (row == null)
                 break;
             c = row.getCell(hp);
-        } while (c != null && c.getCellType().equals(CellType.NUMERIC));
+        } while (c != null && c.getCellType() == CellType.NUMERIC);
         infos[VALID_PERSONS] = vp - infos[START_ROW];
     }
 
@@ -246,6 +246,7 @@ public class MarkTable {
         if (allMarks != null) {
             return;
         }
+        Thread thisThread = Thread.currentThread();
         notifier.notify(AMEvent.CHECK_MT);
         allMarks = new double[SUBJECTS][];
         markSheets = new Sheet[SUBJECTS];
@@ -315,7 +316,7 @@ public class MarkTable {
         Row row;
         for (int i = 0; i < length; i++) {
             row = sheet.getRow(i + vp);
-            row.getCell(hp, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).setCellValue(assignedMarks[i]);
+            row.getCell(hp, MissingCellPolicy.CREATE_NULL_AS_BLANK).setCellValue(assignedMarks[i]);
         }
     }
 
@@ -328,6 +329,7 @@ public class MarkTable {
      * @see MarkTable#checkAndLoad()
      */
     public void calcAssignedMarks() throws AssigningException, InterruptedException {
+        Thread thisThread = Thread.currentThread();
         if (allMarks == null) {
             throw new NullPointerException("please invoke checkAndLoad() first.");
         }
@@ -383,7 +385,7 @@ public class MarkTable {
         try {
             markWorkbook.close();
         } catch (IOException e) {
-            notifier.notify(AMEvent.ERR_FAILED_TO_CLOSE, getExceptionStack(e));
+            notifier.notify(AMEvent.ERR_UNEXPECTED, getExceptionStack(e));
             throw new AssigningException(e);
         }
         if (thisThread.isInterrupted())
@@ -425,6 +427,13 @@ public class MarkTable {
     }
 
     @Override
+    public int hashCode() {
+        return new HashCodeBuilder().append(markWorkbook)
+                .append(outputPath)
+                .append(assigningTable).build();
+    }
+
+    @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof MarkTable))
             return false;
@@ -441,6 +450,7 @@ public class MarkTable {
         return new ToStringBuilder(this).append("assigningTable", assigningTable)
                 .append("notifier", notifier)
                 .append("workbook", markWorkbook)
-                .append("outputPath", outputPath).build();
+                .append("outputPath", outputPath)
+                .append("loaded",allMarks!=null).build();
     }
 }

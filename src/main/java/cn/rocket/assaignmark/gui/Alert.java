@@ -17,8 +17,10 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
 /**
+ * 生成简易对话框，包含提示图案、信息以及确定、取消按钮
+ *
  * @author Rocket
- * @version 1.0.8
+ * @version 1.1.8
  * @since 1.0.8
  */
 public class Alert {
@@ -35,6 +37,14 @@ public class Alert {
     private final AnchorPane anchorPane;
     private final Label text;
 
+    /**
+     * 生成一个对话框
+     *
+     * @param message      传入的要显示的信息
+     * @param controller   控制窗口的Controller实例
+     * @param type         要显示的提示类型，<code>null</code>则无图像
+     * @param enableCancel 决定是否显示取消按钮
+     */
     public Alert(String message, Controller controller, HintType type, boolean enableCancel) {
         assert controller != null;
         this.controller = controller;
@@ -85,12 +95,21 @@ public class Alert {
         alertStage.setOnCloseRequest(event -> close());
     }
 
+    /**
+     * 设置按钮点击事件处理器
+     *
+     * @param okHandler     确定键对应的事件处理器，<code>null</code>则关闭窗口
+     * @param cancelHandler 取消键对应的事件处理器，<code>null</code>同上
+     */
     public void setEventHandler(EventHandler<ActionEvent> okHandler, EventHandler<ActionEvent> cancelHandler) {
         ok.setOnAction(okHandler != null ? okHandler : event -> close());
         if (cancel != null)
             cancel.setOnAction(cancelHandler != null ? cancelHandler : event -> close());
     }
 
+    /**
+     * 显示对话框
+     */
     public void show() {
         alertStage.show();
         if (cancel != null)
@@ -102,6 +121,9 @@ public class Alert {
         alertStage.sizeToScene();
     }
 
+    /**
+     * 关闭对话框
+     */
     public void close() {
         alertStage.close();
         controller.unlockWindow();

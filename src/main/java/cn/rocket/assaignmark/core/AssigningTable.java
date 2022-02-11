@@ -8,6 +8,7 @@ import cn.rocket.assaignmark.core.exception.AssigningException;
 import cn.rocket.assaignmark.core.exception.IncorrectSheetException;
 import cn.rocket.assaignmark.core.exception.InvalidTableException;
 import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.poi.EmptyFileException;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
@@ -17,6 +18,7 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Row.MissingCellPolicy;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
@@ -32,7 +34,7 @@ import static cn.rocket.assaignmark.core.AMFactory.getExceptionStack;
  * 用来存储赋分比例信息
  *
  * @author Rocket
- * @version 1.0.8
+ * @version 1.1.8
  * @since 0.9.8
  */
 public class AssigningTable {
@@ -57,8 +59,6 @@ public class AssigningTable {
     private final Notifier notifier;
     private double[][] allReqrStageNums;
     private boolean[] isRatios;
-
-    private final Thread thisThread = Thread.currentThread();
 
     /**
      * 构造一个赋分表实例，并允许使用给定的<code>notifier</code>，前提是继承该类。
@@ -88,7 +88,7 @@ public class AssigningTable {
         String realParent = parent == null ? LocalURL.JAR_PARENT_PATH : parent;
         try {
             if (AMFactory.getFile(realParent, wbPath)
-                    .length() > 1024 * 1024) { // 1MiB
+                    .length() > 128 * 1024) { // 128 KiB
                 notifier.notify(AMEvent.ERR_INVALID_AT);
                 throw new AssigningException();
             }
@@ -106,7 +106,7 @@ public class AssigningTable {
         }
         assigningSheet = wb.getSheetAt(0);
 
-        if (thisThread.isInterrupted())
+        if (Thread.interrupted())
             interrupt(true);
     }
 
@@ -167,8 +167,8 @@ public class AssigningTable {
         // 读取赋分比例?人数?
         Row boolRow = assigningSheet.getRow(BOOL_ROW);
         for (int i = 0; i < SUBJECTS; i++) {
-            c = boolRow.getCell(i + MARK_COL_START, Row.MissingCellPolicy.RETURN_NULL_AND_BLANK);
-            if (c != null && c.getCellType().equals(CellType.BOOLEAN))
+            c = boolRow.getCell(i + MARK_COL_START, MissingCellPolicy.RETURN_NULL_AND_BLANK);
+            if (c != null && c.getCellType() == CellType.BOOLEAN)
                 isRatios[i] = c.getBooleanCellValue();
             else
                 try {
@@ -192,8 +192,8 @@ public class AssigningTable {
         try {
             for (int i = 0; i < SUBJECTS; i++)
                 for (int r = 0; r < STAGES; r++) {
-                    c = rows[r].getCell(MARK_COL_START + i, Row.MissingCellPolicy.RETURN_NULL_AND_BLANK);
-                    if (c == null || !c.getCellType().equals(CellType.NUMERIC))
+                    c = rows[r].getCell(MARK_COL_START + i, MissingCellPolicy.RETURN_NULL_AND_BLANK);
+                    if (c == null || c.getCellType() != CellType.NUMERIC)
                         allReqrStageNums[i][r] = 0;
                     else {
                         t = Double.parseDouble(formatter.formatCellValue(c));
@@ -215,11 +215,11 @@ public class AssigningTable {
         try {
             wb.close();
         } catch (IOException e) {
-            notifier.notify(AMEvent.ERR_FAILED_TO_CLOSE, getExceptionStack(e));
+            notifier.notify(AMEvent.ERR_UNEXPECTED, getExceptionStack(e));
             throw new AssigningException(e);
         }
 
-        if (thisThread.isInterrupted())
+        if (Thread.interrupted())
             interrupt(false);
     }
 
@@ -289,6 +289,12 @@ public class AssigningTable {
     }
 
     @Override
+    public int hashCode() {
+        return new HashCodeBuilder().append(allReqrStageNums)
+                .append(isRatios).build();
+    }
+
+    @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof AssigningTable))
             return false;
@@ -301,6 +307,7 @@ public class AssigningTable {
 
     @Override
     public String toString() {
-        return new ToStringBuilder(this).append("workbook", wb).build();
+        return new ToStringBuilder(this).append("workbook", wb)
+                .append("loaded", allReqrStageNums != null).build();
     }
 }

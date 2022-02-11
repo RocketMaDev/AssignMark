@@ -9,6 +9,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 /**
+ * 版权窗口对应的Controller
+ *
  * @author Rocket
  * @version 1.0.8
  * @since 1.0.8
@@ -38,7 +40,7 @@ public class Copyright {
      * @param target 需要打开的网址
      * @return <code>true</code>如果无法打开
      */
-    private boolean browseURL(String target) {
+    private static boolean browseURL(String target) {
         if (!Desktop.isDesktopSupported())
             return true;
         Desktop desktop = Desktop.getDesktop();
