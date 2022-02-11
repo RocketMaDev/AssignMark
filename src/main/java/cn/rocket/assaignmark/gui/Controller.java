@@ -31,7 +31,7 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Properties;
 
@@ -192,9 +192,7 @@ public class Controller {
                 new AMFactory(
                         atField.getText(), mtField.getText(), new GUIEventHandler(this), outField.getText()
                 ).work();
-            } catch (RuntimeException e) {
-                if (!(e.getCause() instanceof InterruptedException))
-                    throw e;
+            } catch (Exception ignored) {
             }
         }, "Assigning Task Thread");
         // 在运行任务时按关闭会先终止任务线程
@@ -243,24 +241,35 @@ public class Controller {
                     alert.show();
 
                 } else if (index <= AMEvent.getLastEvent().getIndex()) {
-                    String message = Processor.MSG_ARR[event.ordinal()];
+                    String message = Processor.MSG_ARR[event.ordinal()]; // 事件信息
                     boolean unexpected = false;
                     if (msg != null) {
                         message += "\n";
-                        if (msg.startsWith(AMEvent.ERR_FAILED_TO_CLOSE.toString()) || event == AMEvent.ERR_UNEXPECTED) {
+                        boolean fail;
+                        if ((fail = msg.startsWith(AMEvent.ERR_FAILED_TO_CLOSE.toString())) || event == AMEvent.ERR_UNEXPECTED) {
                             unexpected = true;
-                            message += msg.substring(0, msg.indexOf('\n',
-                                    AMEvent.ERR_FAILED_TO_CLOSE.toString().length() + 2)); // ERR_FAILED_TO_CLOSE\n_
-                            String name = new Date().toString();
-                            Path path = Paths.get(LocalURL.JAR_PARENT_PATH, "/", name, ".txt");
-                            try (BufferedWriter writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8)) {
-                                writer.write(msg);
+                            message += msg.substring(0, msg.indexOf('\n', fail ? // 截断事件栈帧
+                                    AMEvent.ERR_FAILED_TO_CLOSE.toString().length() + 2 : 0)); // if fail -> ERR_FAILED_TO_CLOSE\n_
+                            String name = new SimpleDateFormat("yyyy-MM-dd_hh-mm-ss").format(new Date()); // 生成文件名
+                            Path path = null;
+                            try {
+                                path = new File(LocalURL.JAR_PARENT_PATH + name + ".txt").getCanonicalFile().toPath();
                             } catch (IOException e) {
-                                LogManager.getRootLogger().error("Can't write error log out!");
+                                LogManager.getRootLogger().error("Failed to get file name to save: " +
+                                        e.getLocalizedMessage());
                             }
-                            //TODO IOException 测试
-                            message += "\n发生意料之外的异常，已保存到jar路径下的文件中，" +
-                                    "按确定以复制错误信息（建议复制到word中防止丢失），并请到GitHub/Gitee上发issue";
+                            if (path != null) {
+                                try (BufferedWriter writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8)) {
+                                    writer.write(msg);
+                                } catch (IOException e) {
+                                    LogManager.getRootLogger().error("Can't write error log out: " +
+                                            e.getLocalizedMessage());
+                                }
+                                message += "\n发生意料之外的异常，已保存到jar路径下的文件中，" +
+                                        "按确定以复制错误信息（建议复制到word中防止丢失），并请到GitHub/Gitee上发issue";
+                            } else
+                                message += "\n发生意料之外的异常，" +
+                                        "按确定以复制错误信息（建议复制到word中防止丢失），并请到GitHub/Gitee上发issue";
                         } else
                             message += msg;
                     }
@@ -274,7 +283,7 @@ public class Controller {
                             alert.close();
                         };
 
-                    alert.setEventHandler(handler, null);
+                    alert.setEventHandler(handler, null); // handler默认为null!
                     alert.show();
                 }
             });
