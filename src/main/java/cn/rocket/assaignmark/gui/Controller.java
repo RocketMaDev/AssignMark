@@ -63,7 +63,7 @@ public class Controller {
                     properties.load(in);
                     toBeLoad = properties.getProperty("initialPath");
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    LogManager.getRootLogger().error("Failed to load initial path: ",e);
                 }
             Runtime.getRuntime().addShutdownHook(new Thread(() -> {
                 if (openedPath != null) {
@@ -71,7 +71,7 @@ public class Controller {
                         properties.setProperty("initialPath", openedPath);
                         properties.store(out, null);
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        LogManager.getRootLogger().error("Failed to write properties file: ",e);
                     }
                 }
             }));

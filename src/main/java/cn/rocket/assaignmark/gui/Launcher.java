@@ -39,8 +39,7 @@ public class Launcher extends Application {
         try {
             scene = new Scene(loader.load());
         } catch (IOException e) {
-            LogManager.getRootLogger().error("错误:" + e.getLocalizedMessage());
-            e.printStackTrace();
+            LogManager.getRootLogger().error("Failed to load fxml:",e);
             System.exit(1);
         }
         primaryStage.setTitle("赋分程序");
