@@ -40,7 +40,7 @@ import java.util.Properties;
  * 核心窗口的Controller
  *
  * @author Rocket
- * @version 1.1.8
+ * @version 1.1.8.1
  * @since 1.0.8
  */
 public class Controller {

@@ -41,7 +41,7 @@ AssignMark是一个针对于浙江省新赋分模式的赋分程序，本程序�
 <dependency>
     <groupId>io.github.rocketmadev</groupId>
     <artifactId>AssignMark</artifactId>
-    <version>1.1.8</version>
+    <version>1.1.8.1</version>
 </dependency>
 
 ```
@@ -70,6 +70,7 @@ try {
 ## 未来计划
 
 - [x] 完成图形化界面`(1.1.8)`
+- [ ] 使用每个分数都对应的赋分表赋分
 - [ ] 写Java17的版本`(1.1.17)`
 
 ## 版权声明
