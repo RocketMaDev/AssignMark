@@ -33,6 +33,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Objects;
 import java.util.Properties;
 
 /**
@@ -63,7 +64,7 @@ public class Controller {
                     properties.load(in);
                     toBeLoad = properties.getProperty("initialPath");
                 } catch (IOException e) {
-                    LogManager.getRootLogger().error("Failed to load initial path: ",e);
+                    LogManager.getRootLogger().error("Failed to load initial path: ", e);
                 }
             Runtime.getRuntime().addShutdownHook(new Thread(() -> {
                 if (openedPath != null) {
@@ -71,7 +72,7 @@ public class Controller {
                         properties.setProperty("initialPath", openedPath);
                         properties.store(out, null);
                     } catch (IOException e) {
-                        LogManager.getRootLogger().error("Failed to write properties file: ",e);
+                        LogManager.getRootLogger().error("Failed to write properties file: ", e);
                     }
                 }
             }));
@@ -136,10 +137,21 @@ public class Controller {
 
     private void fillField(TextField field, boolean isReading) {
         File file;
-        if (isReading)
-            file = chooser.showOpenDialog(Launcher.mainStage);
-        else
-            file = chooser.showSaveDialog(Launcher.mainStage);
+        try {
+            if (isReading)
+                file = chooser.showOpenDialog(Launcher.mainStage);
+            else
+                file = chooser.showSaveDialog(Launcher.mainStage);
+        } catch (IllegalArgumentException e) {
+            String str = e.getLocalizedMessage();
+            if (!Objects.equals(str, "Folder parameter must be a valid folder"))
+                throw e;
+            chooser.setInitialDirectory(new File(LocalURL.JAR_PARENT_PATH));
+            if (isReading)
+                file = chooser.showOpenDialog(Launcher.mainStage);
+            else
+                file = chooser.showSaveDialog(Launcher.mainStage);
+        }
         if (file == null)
             return;
         field.setText(file.getAbsolutePath());
