@@ -21,15 +21,30 @@ public class Main {
      * @param args 外部传入参数
      */
     public static void main(String[] args) {
+        String jreVer = System.getProperty("java.runtime.version");
+        try {
+            jreVer = jreVer.substring(0, jreVer.indexOf('.', 2));
+        } catch (StringIndexOutOfBoundsException e) {
+            LOGGER.warn("Unknown JRE version! Try to run with JRE 1.11. Unexpected errors may bo emitted.");
+            jreVer = "1.11";
+        }
         if (args == null || args.length == 0) {
-            if (!System.getProperty("java.runtime.version").startsWith("1.8.")) {
+            if (jreVer.equals("1.8")) {
+                LOGGER.info("Running in JRE 1.8. Suitable.");
+            } else {
+                LOGGER.fatal("Running in JRE " + jreVer + "! Please run this program in 1.8.");
                 LOGGER.fatal("要使用图形化界面，只能使用java8！请使用java8启动此程序，或下载用于java17的版本（如果有）");
                 System.exit(1);
             }
             Launcher.launchSelf();
-            return;
+        } else {
+            if (jreVer.equals("1.8"))
+                LOGGER.info("Running in JRE 1.8. Suitable");
+            else
+                LOGGER.warn("Running in JRE " + jreVer + ". I do not guarantee no unexpected errors. The program was " +
+                        "written in 1.8.");
+            Processor.main(args);
         }
-        Processor.main(args);
     }
 
     /**
