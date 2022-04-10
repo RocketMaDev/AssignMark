@@ -44,6 +44,14 @@ import java.util.Properties;
  * @since 1.0.8
  */
 public class Controller {
+    private static final String[] MSG_ARR;
+
+    static {
+        MSG_ARR = new String[Processor.MSG_ARR.length];
+        System.arraycopy(Processor.MSG_ARR, 0, MSG_ARR, 0, MSG_ARR.length);
+        MSG_ARR[AMEvent.ERR_INVALID_AT.ordinal()] = "错误： 未经验证的赋分表！请使用打开文件按钮右边的导出按钮生成赋分表";
+    }
+
     private final Properties properties = new Properties();
     private final FileChooser chooser;
     private boolean confirmation;
@@ -241,19 +249,19 @@ public class Controller {
                 if (index < AMEvent.DONE.getIndex()) {
                     progressBar.setProgress((double) (index + 1) / max);
                     progressLabel.setText(String.format("%d/%d", index + 1, max));
-                    statusLabel.setText(Processor.MSG_ARR[index]);
+                    statusLabel.setText(MSG_ARR[index]);
 
                 } else if (index == AMEvent.DONE.getIndex()) {
                     progressBar.setProgress(1);
                     progressLabel.setText(String.format("%d/%d", max, max));
-                    statusLabel.setText(Processor.MSG_ARR[index]);
+                    statusLabel.setText(MSG_ARR[index]);
 
-                    Alert alert = new Alert(Processor.MSG_ARR[index], ctrler, HintType.DONE, false);
+                    Alert alert = new Alert(MSG_ARR[index], ctrler, HintType.DONE, false);
                     alert.setEventHandler(null, null);
                     alert.show();
 
                 } else if (index <= AMEvent.getLastEvent().getIndex()) {
-                    String message = Processor.MSG_ARR[event.ordinal()]; // 事件信息
+                    String message = MSG_ARR[event.ordinal()]; // 事件信息
                     boolean unexpected = false;
                     if (msg != null) {
                         message += "\n";
