@@ -44,6 +44,7 @@ import java.util.Properties;
  * @since 1.0.8
  */
 public class Controller {
+    //TODO ExceptionHandler for JavaFxThread
     private static final String[] MSG_ARR;
 
     static {
