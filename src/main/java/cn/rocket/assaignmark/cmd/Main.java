@@ -25,7 +25,7 @@ public class Main {
         try {
             jreVer = jreVer.substring(0, jreVer.indexOf('.', 2));
         } catch (StringIndexOutOfBoundsException e) {
-            LOGGER.warn("Unknown JRE version! Try to run with JRE 1.11. Unexpected errors may bo emitted.");
+            LOGGER.warn("Unknown JRE version! Try to run with JRE 1.11. Unexpected errors may be emitted.");
             jreVer = "1.11";
         }
         if (args == null || args.length == 0) {
