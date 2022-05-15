@@ -39,8 +39,9 @@ AssignMark是一个针对于浙江省新赋分模式的赋分程序，本程序�
 
 <dependency>
     <groupId>io.github.rocketmadev</groupId>
-   <artifactId>AssignMark</artifactId>
-   <version>1.1.8.3</version>
+    <artifactId>AssignMark</artifactId>
+    <version>1.1.8.3</version>
+    <!--版本号可选1.1.8.3-core如果不需要应用实现（即只调用库）-->
 </dependency>
 
 ```
