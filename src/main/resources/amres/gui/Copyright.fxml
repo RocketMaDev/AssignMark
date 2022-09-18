@@ -27,6 +27,6 @@
           AnchorPane.topAnchor="198.0"/>
    <Hyperlink layoutX="329.0" layoutY="204.0" onAction="#licenseClicked" prefWidth="318.0"
               text="./blob/maven/LICENSE OF USED LIBS" AnchorPane.leftAnchor="329.0" AnchorPane.rightAnchor="40.0"/>
-   <Label layoutX="40.0" layoutY="250.0" text="当前版本：1.1.8.3" AnchorPane.topAnchor="251.0"/>
+   <Label layoutX="40.0" layoutY="250.0" text="当前版本：1.1.8.4" AnchorPane.topAnchor="251.0"/>
    <Label fx:id="errLabel" layoutX="40.0" layoutY="291.0" text="不支持在浏览器中打开！请自行打开" textFill="RED" visible="false"/>
 </AnchorPane>

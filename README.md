@@ -10,7 +10,7 @@ AssignMark是一个针对于浙江省新赋分模式的赋分程序，本程序�
 ## 使用方法
 
 1. 命令行  
-   参数详解：（**注意事项：A,I,O选项在赋分时必须使用，不进行赋分，可选h,e参数，必须是xlsx文件**）
+   参数详解：（**注意事项：A,I,O选项在赋分时必须使用，不进行赋分，可选h,e参数，必须是xlsx文件**）**此处的相对路径相对jar所在路径**
 
 | 参数名 | 类型  | 参数描述                    |
 |-----|-----|-------------------------|
@@ -40,8 +40,8 @@ AssignMark是一个针对于浙江省新赋分模式的赋分程序，本程序�
 <dependency>
    <groupId>io.github.rocketmadev</groupId>
    <artifactId>AssignMark</artifactId>
-   <version>1.1.8.3</version>
-   <!--版本号可选1.1.8.3-core如果不需要应用实现（即只调用库）-->
+   <version>1.1.8.4</version>
+   <!--版本号可选1.1.8.4-core如果不需要应用实现（即只调用库）-->
 </dependency>
 
 ```
